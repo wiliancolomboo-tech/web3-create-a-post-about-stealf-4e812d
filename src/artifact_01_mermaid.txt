@@ -1,0 +1,44 @@
+flowchart TD
+    subgraph ClientLayer["Off-Chain Client Layer"]
+        Sender["Sender Wallet<br/>(Signs with Ephemeral Keypair r, R)"]
+        Recipient["Recipient Worker / Client<br/>(Continuous Scanner with Viewing PrivKey v)"]
+    end
+
+    subgraph ProgramLayer["Stealf On-Chain Core Protocol (Anchor Engine)"]
+        subgraph RegistrySection["1. Registry State"]
+            RegRegistry["Stealth Meta-Registry PDA<br/>seeds=['registry', owner_pubkey]<br/>Stores: K_spend, K_view"]
+        end
+
+        subgraph TransferSection["2. Settlement & Announcement"]
+            AnnouncementPDA["Announcement Record PDA<br/>seeds=['announcement', stealth_address]<br/>Stores: Ephemeral Pubkey R, Metadata, Nonce"]
+            StealthEscrowPDA["Stealth Escrow Vault PDA<br/>seeds=['vault', stealth_address]<br/>Holds Native SOL / SPL Tokens"]
+        end
+
+        subgraph ValidationGuards["3. Security & Validation Boundary"]
+            SignerCheck{"Constraint:<br/>Is Caller Authorized / Signed?"}
+            ReentrancyGuard{"State Flag:<br/>Account Status == UNCLAIMED"}
+            SeedDerivation{"Constraint Check:<br/>stealth_address == H(S, K_spend)"}
+        end
+    end
+
+    subgraph LedgerCPI["Solana System / Token Program"]
+        SystemProgram["System Program / SPL Token Program"]
+    end
+
+    %% Sender Flow
+    Sender -->|"1. Query Keys (K_spend, K_view)"| RegRegistry
+    Sender -->|"2. Derive Shared Secret S = r * K_view<br/>Compute Stealth Pubkey P_stealth"| Sender
+    Sender -->|"3. invoke: send_sol(ephemeral_pubkey_R, amount)"| StealthEscrowPDA
+    StealthEscrowPDA -.->|"CPI: Transfer Funds to Vault"| SystemProgram
+    Sender -->|"4. invoke: publish_announcement(R, P_stealth)"| AnnouncementPDA
+
+    %% Scanning Flow
+    AnnouncementPDA -.->|"WebSocket / Geyser Stream Logs"| Recipient
+    Recipient -->|"5. Scan & Compute S' = v * R<br/>Derive Matching P_stealth"| Recipient
+
+    %% Claim Flow
+    Recipient -->|"6. invoke: claim_stealth_funds(signature / claim_proof)"| SignerCheck
+    SignerCheck --> SeedDerivation
+    SeedDerivation --> ReentrancyGuard
+    ReentrancyGuard -->|"7. CPI: Disburse Funds + Close Accounts"| SystemProgram
+    SystemProgram -->|"Rent + Funds Transferred"| Recipient

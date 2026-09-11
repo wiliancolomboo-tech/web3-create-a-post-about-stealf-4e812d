@@ -1,0 +1,1 @@
+solana address -k target/deploy/stealf-keypair.json
