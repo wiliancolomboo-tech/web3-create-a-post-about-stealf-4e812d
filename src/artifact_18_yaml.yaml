@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  stealf-sentinel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      - SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+      - ENTERPRISE_WEBHOOK=${ENTERPRISE_WEBHOOK}
+      - RECIPIENT_VIEW_PRIV=${RECIPIENT_VIEW_PRIV}
+      - RECIPIENT_SPEND_PUB=${RECIPIENT_SPEND_PUB}
+    ports:
+      - "8080:8080"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"

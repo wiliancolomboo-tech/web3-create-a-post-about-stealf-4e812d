@@ -1,0 +1,8 @@
+client/
+├── package.json
+├── tsconfig.json
+└── src/
+    ├── crypto.ts
+    ├── announcer.ts
+    ├── scanner.ts
+    └── index.ts

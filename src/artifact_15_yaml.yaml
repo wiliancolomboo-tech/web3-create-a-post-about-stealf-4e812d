@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  stealf-sentinel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stealf-sentinel-daemon
+    restart: always
+    environment:
+      - SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+      - STEALF_PROGRAM_ID=StEALF1111111111111111111111111111111111111
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - ALERT_EMAIL_RECIPIENT=${ALERT_EMAIL_RECIPIENT}
+    volumes:
+      - ./production-keys.json:/etc/stealf/keys.json:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"

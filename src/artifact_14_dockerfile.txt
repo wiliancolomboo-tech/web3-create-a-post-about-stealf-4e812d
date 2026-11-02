@@ -1,0 +1,22 @@
+FROM node:20-alpine AS builder
+
+WORKDIR /usr/src/app
+
+COPY stealf-agent/package*.json ./
+RUN npm ci
+
+COPY stealf-agent/tsconfig.json ./
+COPY stealf-agent/src ./src
+RUN npm run build
+
+FROM node:20-alpine
+
+WORKDIR /app
+COPY stealf-agent/package*.json ./
+RUN npm ci --only=production
+
+COPY --from=builder /usr/src/app/dist ./dist
+
+USER node
+ENTRYPOINT ["node", "dist/cli.js"]
+CMD ["--help"]

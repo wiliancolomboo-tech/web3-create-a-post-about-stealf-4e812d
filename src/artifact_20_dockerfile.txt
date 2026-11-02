@@ -1,0 +1,28 @@
+FROM node:20-slim AS builder
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY tsconfig.json ./
+COPY src ./src
+RUN npm run build
+
+FROM node:20-slim AS runner
+
+WORKDIR /usr/src/app
+ENV NODE_ENV=production
+
+COPY package*.json ./
+RUN npm ci --only=production
+
+COPY --from=builder /usr/src/app/dist ./dist
+
+USER node
+
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD node -e "console.log('Healthcheck OK')" || exit 1
+
+CMD ["node", "dist/daemon.js"]

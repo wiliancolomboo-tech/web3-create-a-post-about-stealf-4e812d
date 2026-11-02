@@ -1,0 +1,28 @@
+flowchart TD
+    subgraph SENDER_FLOW ["Sender Workflow"]
+        A[Recipient Meta-Address: K_spend, K_view] --> B[Generate Ephemeral Keypair: r, R = r*G]
+        B --> C[Compute Shared Secret: S = r * K_view]
+        C --> D[Derive Stealth Pubkey: P_stealth = K_spend + H_S * G]
+        D --> E[Compute View Tag: 1-byte hash prefix]
+        E --> F[Invoke Stealf Anchor Contract]
+    end
+
+    subgraph SOLANA_RUNTIME ["Solana On-Chain Engine (Anchor)"]
+        F -->|Transfer SOL/SPL + Announcement| G[Stealf Announcement Vault]
+        G --> H{Verify State & Escrow Funds}
+        H -->|Emit Event| I[Event: StealthTransferAnnounced]
+        H -->|Lock Funds| J[Stealth PDA Account: P_stealth]
+    end
+
+    subgraph OFFCHAIN_DAEMON ["Enterprise Scanner & Sweeper Worker"]
+        I -.->|WebSocket / Geyser Stream| K[Indexer Filter: View Tag Pre-Filter]
+        K -->|Tag Match| L[Compute Shared Secret: S' = k_view * R]
+        L -->|Check Derived Pubkey == P_stealth| M{Ownership Verified?}
+        M -->|Yes| N[Derive p_stealth = k_spend + H_S]
+        M -->|No| O[Discard Noise Announcement]
+        N --> P[Sign Sweep Instruction to Enterprise Treasury]
+        P --> Q[Send Sweep TX to RPC]
+        N --> R[Dispatch Real-Time Webhook Alert: Slack / Discord]
+    end
+
+    Q -->|Drain PDA| S[Enterprise Vault / Cold Storage]

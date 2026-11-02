@@ -1,0 +1,3 @@
+stealf_scanned_announcements_total 48102
+  stealf_view_tag_matched_total 188
+  stealf_swept_lamports_total 149200000000

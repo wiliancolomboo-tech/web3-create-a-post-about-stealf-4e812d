@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  stealf-sentinel:
+    build: .
+    restart: unless-stopped
+    environment:
+      - SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+      - STEALF_PROGRAM_ID=Stea1f1111111111111111111111111111111111111
+      - DISCORD_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder
+      - RESEND_API_KEY=re_enterprise_key_here
+      - NOTIFICATION_EMAIL=cfo@enterprise-client.io
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

@@ -1,0 +1,10 @@
++------------------------------------+--------------------------+-----------------------+--------+
+| Test Case Identifier               | Input Vector             | Expected Result       | Status |
++------------------------------------+--------------------------+-----------------------+--------+
+| TC-01: DKSAP Key Derivation        | Valid Ed25519 Pubkeys    | Deterministic P & v   | PASS   |
+| TC-02: Fast View-Tag Scanning      | Matching View Key        | O(1) Tag Match & Sig  | PASS   |
+| TC-03: Counterparty Isolation      | Foreign View Key         | Immediate Drop        | PASS   |
+| TC-04: View-Tag Collision Drop     | Corrupted 1-byte tag     | Early Drop, 0 CPU lag | PASS   |
+| TC-05: Rent-Recovery Constraints   | Slot Delta < 259,200     | Revert PruningWindow  | PASS   |
+| TC-06: Enterprise Webhook Alert    | Slack/Resend Mock Hook   | HTTP 200 OK           | PASS   |
++------------------------------------+--------------------------+-----------------------+--------+

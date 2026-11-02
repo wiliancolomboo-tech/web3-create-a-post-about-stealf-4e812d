@@ -1,0 +1,1 @@
+npm install @solana/web3.js @coral-xyz/anchor @noble/curves @noble/hashes dotenv commander

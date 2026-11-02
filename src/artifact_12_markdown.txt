@@ -1,0 +1,22 @@
+🧵 1/3: Public transaction graphs are costing businesses their competitive edge. On Solana, every vendor payout, payroll run, and OTC transaction is indexed in real time. 
+
+Enter @StealfProtocol: Non-Interactive Stealth Payments built natively for the SVM. 🛡️⚡
+
+#Solana #Privacy #Web3Security
+
+---
+
+🧵 2/3: How Stealf works:
+1️⃣ Recipient publishes a dual-key Meta-Address (Spend + View)
+2️⃣ Sender computes an ephemeral Diffie-Hellman scalar: S = r * P_view
+3️⃣ Funds land on a fresh, mathematically unlinkable stealth address
+4️⃣ Recipient view-scans & sweeps with ZERO public linkage! 🔐
+
+---
+
+🧵 3/3: With Stealf:
+✅ Decoupled View-Key auditing for compliance & accounting
+✅ Real-time Enterprise Webhooks (Slack/Discord/ERP)
+✅ Zero MEV or competitor tracking of counterparties
+
+Check out our production Anchor program, CLI, and test suite on Solana! 🚀

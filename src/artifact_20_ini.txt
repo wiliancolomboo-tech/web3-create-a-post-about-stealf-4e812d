@@ -1,0 +1,7 @@
+SOLANA_RPC_URL=https://api.devnet.solana.com
+DISCORD_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder
+RESEND_API_KEY=re_your_api_key_here
+ALERT_EMAIL=treasury-alerts@enterprise.com
+STEALF_VIEW_KEY_HEX=11223344556677889900aabbccddeeff11223344556677889900aabbccddeeff
+STEALF_SPEND_KEY_HEX=ffeeddccbbaa00998877665544332211ffeeddccbbaa00998877665544332211
+STEALF_TREASURY_PUBKEY=7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU

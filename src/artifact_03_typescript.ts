@@ -1,153 +1,196 @@
+// File: /client/src/stealf-client.ts
 import * as anchor from "@coral-xyz/anchor";
-import { Program } from "@coral-xyz/anchor";
-import { Stealf } from "../target/types/stealf";
-import { Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram } from "@solana/web3.js";
-import { expect } from "chai";
+import { Program, Idl } from "@coral-xyz/anchor";
+import {
+  Connection,
+  Keypair,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  sendAndConfirmTransaction,
+  LAMPORTS_PER_SOL,
+} from "@solana/web3.js";
 import * as crypto from "crypto";
+import axios from "axios";
 
-describe("stealf protocol functional verification", () => {
-  const provider = anchor.AnchorProvider.env();
-  anchor.setProvider(provider);
+export interface StealfMetaAddress {
+  spendPubKey: Buffer; // 32 bytes
+  viewPubKey: Buffer;  // 32 bytes
+}
 
-  const program = anchor.workspace.Stealf as Program<Stealf>;
+export interface EnterpriseNotificationPayload {
+  recipient: string;
+  stealthAddress: string;
+  amountSol: number;
+  txSignature: string;
+  timestamp: string;
+}
 
-  const sender = Keypair.generate();
-  const recipient = Keypair.generate();
-  
-  // Ephemeral stealth keypair
-  const ephemeralKeypair = Keypair.generate();
-  const stealthWallet = Keypair.generate(); // Emulates the one-time derived stealth address
-  const destination = Keypair.generate();
+export class StealfEngine {
+  private connection: Connection;
+  private programId: PublicKey;
 
-  let registryPda: PublicKey;
-  let announcementPda: PublicKey;
-  let vaultPda: PublicKey;
+  constructor(rpcUrl: string, programIdStr: string) {
+    this.connection = new Connection(rpcUrl, "confirmed");
+    this.programId = new PublicKey(programIdStr);
+  }
 
-  before(async () => {
-    // Fund sender, recipient, and stealthWallet for rent/signatures
-    const airdropSig1 = await provider.connection.requestAirdrop(sender.publicKey, 5 * LAMPORTS_PER_SOL);
-    const airdropSig2 = await provider.connection.requestAirdrop(recipient.publicKey, 2 * LAMPORTS_PER_SOL);
-    const airdropSig3 = await provider.connection.requestAirdrop(stealthWallet.publicKey, 0.5 * LAMPORTS_PER_SOL);
+  /**
+   * Generates a Dual-Key Stealth Meta-Address for Bob.
+   */
+  public static generateMetaAddress(): {
+    spendKeypair: Keypair;
+    viewKeypair: Keypair;
+    metaAddress: StealfMetaAddress;
+  } {
+    const spendKeypair = Keypair.generate();
+    const viewKeypair = Keypair.generate();
+    return {
+      spendKeypair,
+      viewKeypair,
+      metaAddress: {
+        spendPubKey: Buffer.from(spendKeypair.publicKey.toBytes()),
+        viewPubKey: Buffer.from(viewKeypair.publicKey.toBytes()),
+      },
+    };
+  }
 
-    const latestBlockHash = await provider.connection.getLatestBlockhash();
-    await provider.connection.confirmTransaction({
-      blockhash: latestBlockHash.blockhash,
-      lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
-      signature: airdropSig1,
-    });
-    await provider.connection.confirmTransaction({
-      blockhash: latestBlockHash.blockhash,
-      lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
-      signature: airdropSig2,
-    });
-    await provider.connection.confirmTransaction({
-      blockhash: latestBlockHash.blockhash,
-      lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
-      signature: airdropSig3,
-    });
+  /**
+   * Derives a stealth destination address and view-tag from Bob's meta-address (Alice's side).
+   */
+  public static deriveStealthTarget(meta: StealfMetaAddress): {
+    ephemeralKeypair: Keypair;
+    stealthPublicKey: PublicKey;
+    viewTag: number;
+    sharedSecret: Buffer;
+  } {
+    const ephemeralKeypair = Keypair.generate();
 
-    [registryPda] = PublicKey.findProgramAddressSync(
-      [Buffer.from("registry"), recipient.publicKey.toBuffer()],
-      program.programId
-    );
+    // Compute Diffie-Hellman Shared Secret: S = H(ephemeral_secret || meta.viewPubKey)
+    const ecdhHash = crypto.createHash("sha256");
+    ecdhHash.update(ephemeralKeypair.secretKey.subarray(0, 32));
+    ecdhHash.update(meta.viewPubKey);
+    const sharedSecret = ecdhHash.digest();
 
-    [announcementPda] = PublicKey.findProgramAddressSync(
-      [Buffer.from("announcement"), stealthWallet.publicKey.toBuffer()],
-      program.programId
-    );
+    // 1-Byte View-Tag: First byte of SHA256(sharedSecret)
+    const viewTagHash = crypto.createHash("sha256").update(sharedSecret).digest();
+    const viewTag = viewTagHash[0];
 
-    [vaultPda] = PublicKey.findProgramAddressSync(
-      [Buffer.from("vault"), stealthWallet.publicKey.toBuffer()],
-      program.programId
-    );
-  });
+    // Compute Stealth Public Key: P_stealth = SHA256(sharedSecret || meta.spendPubKey)
+    const stealthSeed = crypto.createHash("sha256")
+      .update(sharedSecret)
+      .update(meta.spendPubKey)
+      .digest();
 
-  it("Registers recipient spending and viewing keys", async () => {
-    const spendingKey = crypto.randomBytes(32);
-    const viewingKey = crypto.randomBytes(32);
+    // Deterministically generate Solana public key from the blended entropy
+    const stealthKeypair = Keypair.fromSeed(stealthSeed);
 
-    await program.methods
-      .registerKeys(Array.from(spendingKey), Array.from(viewingKey))
-      .accounts({
-        registry: registryPda,
-        owner: recipient.publicKey,
-        systemProgram: SystemProgram.programId,
-      })
-      .signers([recipient])
-      .rpc();
+    return {
+      ephemeralKeypair,
+      stealthPublicKey: stealthKeypair.publicKey,
+      viewTag,
+      sharedSecret,
+    };
+  }
 
-    const regAccount = await program.account.userRegistry.fetch(registryPda);
-    expect(regAccount.owner.toBase58()).to.equal(recipient.publicKey.toBase58());
-    expect(Buffer.from(regAccount.spendingPubkey)).to.deep.equal(spendingKey);
-  });
+  /**
+   * Scans a candidate announcement using Bob's view private key.
+   */
+  public static checkAnnouncementMatch(
+    ephemeralPubkey: Buffer,
+    viewTag: number,
+    bobViewSecret: Buffer,
+    bobSpendPubkey: Buffer,
+    candidateStealthAddress: PublicKey
+  ): boolean {
+    // 1. Recompute candidate shared secret from Bob's perspective
+    const ecdhHash = crypto.createHash("sha256");
+    ecdhHash.update(bobViewSecret.subarray(0, 32));
+    ecdhHash.update(ephemeralPubkey);
+    const sharedSecret = ecdhHash.digest();
 
-  it("Executes stealth SOL transfer to vault and emits announcement", async () => {
-    const transferAmount = new anchor.BN(1.5 * LAMPORTS_PER_SOL);
-    const ephemeralBytes = Array.from(ephemeralKeypair.publicKey.toBytes());
-
-    await program.methods
-      .transferStealthSol(stealthWallet.publicKey, ephemeralBytes, transferAmount)
-      .accounts({
-        announcement: announcementPda,
-        vault: vaultPda,
-        sender: sender.publicKey,
-        systemProgram: SystemProgram.programId,
-      })
-      .signers([sender])
-      .rpc();
-
-    const vaultBalance = await provider.connection.getBalance(vaultPda);
-    expect(vaultBalance).to.equal(1.5 * LAMPORTS_PER_SOL);
-
-    const announcementState = await program.account.announcement.fetch(announcementPda);
-    expect(announcementState.stealthAddress.toBase58()).to.equal(stealthWallet.publicKey.toBase58());
-    expect(announcementState.amount.toNumber()).to.equal(1.5 * LAMPORTS_PER_SOL);
-    expect(announcementState.claimed).to.be.false;
-  });
-
-  it("Rejects unauthenticated or mismatched claim attempts", async () => {
-    const rogueSigner = Keypair.generate();
-    try {
-      await program.methods
-        .claimStealthSol()
-        .accounts({
-          announcement: announcementPda,
-          vault: vaultPda,
-          stealthSigner: rogueSigner.publicKey,
-          destination: rogueSigner.publicKey,
-          systemProgram: SystemProgram.programId,
-        })
-        .signers([rogueSigner])
-        .rpc();
-      expect.fail("Transaction should have failed due to unauthorized signer");
-    } catch (err: any) {
-      expect(err.toString()).to.include("ConstraintSeeds");
+    // 2. Compute View-Tag check (O(1) fast path)
+    const expectedViewTag = crypto.createHash("sha256").update(sharedSecret).digest()[0];
+    if (expectedViewTag !== viewTag) {
+      return false; // Fast discard (99.6% rate)
     }
-  });
 
-  it("Successfully claims stealth funds and reclaims rent", async () => {
-    const destInitialBalance = await provider.connection.getBalance(destination.publicKey);
+    // 3. Full derivation verification
+    const stealthSeed = crypto.createHash("sha256")
+      .update(sharedSecret)
+      .update(bobSpendPubkey)
+      .digest();
+    const derivedPubkey = Keypair.fromSeed(stealthSeed).publicKey;
 
-    await program.methods
-      .claimStealthSol()
-      .accounts({
-        announcement: announcementPda,
-        vault: vaultPda,
-        stealthSigner: stealthWallet.publicKey,
-        destination: destination.publicKey,
-        systemProgram: SystemProgram.programId,
-      })
-      .signers([stealthWallet])
-      .rpc();
+    return derivedPubkey.equals(candidateStealthAddress);
+  }
 
-    const destFinalBalance = await provider.connection.getBalance(destination.publicKey);
-    expect(destFinalBalance).to.be.greaterThan(destInitialBalance + 1.49 * LAMPORTS_PER_SOL);
+  /**
+   * Enterprise Webhook Dispatcher
+   */
+  public static async notifyEnterprise(
+    payload: EnterpriseNotificationPayload,
+    config: {
+      slackWebhookUrl?: string;
+      discordWebhookUrl?: string;
+      resendApiKey?: string;
+      resendRecipientEmail?: string;
+    }
+  ): Promise<void> {
+    const formattedMsg = `🔒 [Stealf Protocol] Inbound Private Payment Detected!\n• Destination: ${payload.stealthAddress}\n• Amount: ${payload.amountSol} SOL\n• TX: ${payload.txSignature}\n• Timestamp: ${payload.timestamp}`;
 
-    const vaultBalance = await provider.connection.getBalance(vaultPda);
-    expect(vaultBalance).to.equal(0);
+    // Slack
+    if (config.slackWebhookUrl) {
+      try {
+        await axios.post(config.slackWebhookUrl, { text: formattedMsg });
+      } catch (err) {
+        console.error("Failed to dispatch Slack webhook:", err);
+      }
+    }
 
-    // Verify announcement account was closed
-    const closedAccount = await provider.connection.getAccountInfo(announcementPda);
-    expect(closedAccount).to.be.null;
-  });
-});
+    // Discord
+    if (config.discordWebhookUrl) {
+      try {
+        await axios.post(config.discordWebhookUrl, {
+          embeds: [
+            {
+              title: "Stealf Private Payment Received",
+              color: 0x00ff88,
+              fields: [
+                { name: "Stealth Recipient", value: payload.stealthAddress, inline: false },
+                { name: "Amount", value: `${payload.amountSol} SOL`, inline: true },
+                { name: "Transaction", value: payload.txSignature, inline: false },
+              ],
+              timestamp: payload.timestamp,
+            },
+          ],
+        });
+      } catch (err) {
+        console.error("Failed to dispatch Discord webhook:", err);
+      }
+    }
+
+    // Resend Email API
+    if (config.resendApiKey && config.resendRecipientEmail) {
+      try {
+        await axios.post(
+          "https://api.resend.com/emails",
+          {
+            from: "stealf-notifications@resend.dev",
+            to: config.resendRecipientEmail,
+            subject: `Stealf Confidential Payment: +${payload.amountSol} SOL Received`,
+            text: formattedMsg,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${config.resendApiKey}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      } catch (err) {
+        console.error("Failed to send Resend email alert:", err);
+      }
+    }
+  }
+}

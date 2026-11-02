@@ -1,0 +1,7 @@
+How does Stealf work?
+
+1️⃣ Ephemeral ECDH: Sender combines recipient's View & Spend keys to generate an unlinkable, one-time PDA.
+2️⃣ No Relayers: Zero mixer pools or compliance blacklists. 
+3️⃣ Selective Audit: Recipient shares View Key with auditors while keeping Spend Keys cold.
+
+Full open-source engine: https://github.com/stealf-solana/core

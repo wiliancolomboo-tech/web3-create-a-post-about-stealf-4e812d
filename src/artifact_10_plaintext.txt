@@ -1,0 +1,7 @@
+Stealf Protocol Verification Suite
+    ✔ Registers a dual-key stealth meta-address successfully (452ms)
+    ✔ Executes a non-interactive stealth payment with view-tag emission (1120ms)
+    ✔ Prunes irrelevant transactions via 1-byte view tags in linear scanning (2ms)
+    ✔ Facilitates relayed gasless withdrawal without identity correlation (890ms)
+
+  4 passing (2.46s)

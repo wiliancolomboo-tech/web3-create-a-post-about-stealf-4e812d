@@ -1,0 +1,12 @@
+# Solana Network Configuration
+SOLANA_RPC_URL=https://api.devnet.solana.com
+
+# Recipient Stealth Meta-Keys (Keep Spending Key Secure)
+STEALF_VIEW_KEY=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+STEALF_SPEND_KEY=fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+
+# Final Cold Storage Destination for Swept Capital
+STEALF_COLD_VAULT_PUBKEY=ColdVaultPubkey11111111111111111111111111111
+
+# Real-time Telemetry Webhooks (Discord or Slack)
+ENTERPRISE_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder

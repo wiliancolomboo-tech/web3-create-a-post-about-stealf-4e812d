@@ -1,0 +1,46 @@
+flowchart TD
+    subgraph SENDER ["Alice (Sender)"]
+        A1["Recipient Stealth Meta-Address<br/>M = (K_spend, K_view)"]
+        A2["Generate Ephemeral Keypair<br/>r ∈ 𝔽_q, R = r · G"]
+        A3["Compute Shared Secret & View Tag<br/>S = r · K_view<br/>v = H_tag(S)[0]<br/>c = H_scalar(S)"]
+        A4["Derive Stealth Pubkey<br/>P_stealth = K_spend + c · G"]
+    end
+
+    subgraph ONCHAIN ["Solana Runtime & Stealf Anchor Program"]
+        direction TB
+        P1["Instruction: initialize_stealth_transfer"]
+        P2{"Security Guards:<br/>1. R != 0 & Valid Point<br/>2. Lamports > Rent Exemption<br/>3. Anti-Collision Nonce Unique"}
+        
+        PDA_ANN["Announcement Account PDA<br/>Seeds: ['announcement', R, P_stealth]<br/>Fields:<br/>- ephemeral_pubkey: [u8; 32]<br/>- stealth_pubkey: Pubkey<br/>- view_tag: u8<br/>- timestamp: i64<br/>- caller: Pubkey"]
+        
+        VAULT["Stealth Destination / Vault<br/>(SOL System Account or Associated Token Account)"]
+        
+        P1 --> P2
+        P2 -->|Pass| PDA_ANN
+        P2 -->|Transfer Funds via CPI| VAULT
+    end
+
+    subgraph SCANNER ["Bob (Recipient Scanning Service)"]
+        B1["Fetch Announcement Accounts<br/>(Filter by View Tag byte = H_tag(k_view · R)[0])"]
+        B2{"View Tag Match?<br/>v == announcement.view_tag"}
+        B3["Skip Announcement<br/>(Filter 99.61% non-matches)"]
+        B4["Derive Full Shared Secret<br/>S' = k_view · R"]
+        B5["Verify Pubkey Derivation<br/>P' = K_spend + H_scalar(S') · G == P_stealth"]
+    end
+
+    subgraph SWEEPER ["Bob / Relayer (Fund Sweeper)"]
+        C1["Compute Stealth Private Key<br/>p_stealth = k_spend + H_scalar(S') mod q"]
+        C2["Construct Sweep Transaction<br/>Signer: p_stealth (Disposable Keypair)"]
+        C3["Instruction: sweep_and_close<br/>Reclaim Announcement Rent -> Bob<br/>Transfer Lamports/SPL -> Clean Wallet / Relayer"]
+    end
+
+    A1 --> A2 --> A3 --> A4
+    A4 -->|Send Tx: SOL/Tokens + Announcement| P1
+    PDA_ANN -.->|RPC getProgramAccounts / WebSocket| B1
+    B1 --> B2
+    B2 -- No --> B3
+    B2 -- Yes --> B4 --> B5
+    B5 -->|Match Confirmed| C1
+    C1 --> C2 --> C3
+    C3 -->|Close Account CPI| PDA_ANN
+    C3 -->|Transfer Balance| ONCHAIN

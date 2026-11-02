@@ -1,0 +1,11 @@
+1/4 🛡️ Public ledgers shouldn't mean public balance sheets. Introducing @StealfProtocol on @Solana — a non-interactive stealth address engine bringing enterprise-grade financial privacy to high-speed DeFi & payroll. 🧵👇
+
+2/4 ⚡ Why Stealf? Instead of mixers or heavy zk-circuits that break composability and risk regulatory blacklisting, Stealf uses ephemeral Diffie-Hellman (Curve25519) to generate one-time, unlinkable Solana accounts with zero liquidity fragmentation.
+
+3/4 🔑 Key Features:
+✅ O(1) View Tags for sub-millisecond wallet scanning
+✅ Compliant Auditing via read-only Viewing Keys
+✅ Gasless Relayer claims for complete transaction unlinkability
+✅ 100% native SOL & SPL/Token-2022 compatibility
+
+4/4 🚀 Built for production, completely open-source, and turnkey deployable via Docker & Anchor. Check out the full architecture, contracts, and test suite: github.com/stealf-protocol/stealf-core #Solana #Privacy #Web3 #SolanaBounty

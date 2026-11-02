@@ -1,0 +1,8 @@
+SOLANA_RPC_URL=https://api.devnet.solana.com
+   STEALF_PROGRAM_ID=SteLfh3V1z9k8D9qB2t8vCjMh4kP9wE5aN1yGZ7xQpm
+   RECIPIENT_VIEW_PRIV_KEY=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+   RECIPIENT_SPEND_PUB_KEY=7c4a8d09ca3762af61e59520943dc26494f8941b0b5de39736c5617a22ea07d0
+   DISCORD_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder
+   RESEND_API_KEY=re_1234567890abcdef
+   AUDIT_EMAIL_TO=treasury-compliance@stealf.protocol
+   PORT=8080

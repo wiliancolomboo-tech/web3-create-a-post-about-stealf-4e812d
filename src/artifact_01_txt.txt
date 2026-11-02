@@ -1,0 +1,15 @@
++---------------------------------------------------------------------------------------------------+
+|                                      STEALF VALUE MATRIX                                          |
++----------------------+----------------------------------------------------+-----------------------+
+| Feature              | Traditional Public Transfers                       | Stealf Protocol       |
++----------------------+----------------------------------------------------+-----------------------+
+| Recipient Linkability| 100% linkable via explorer clustering              | 0% (Cryptographically |
+|                      |                                                    | unlinkable one-times) |
+| Custody Risk         | Self-custodial                                     | 100% Self-custodial   |
+| Regulatory Fit       | Tainted mixer risk (Tornado/OFAC risk vectors)    | Clean provenance; no  |
+|                      |                                                    | pooled mixing pools   |
+| Solana Speed & Fees  | ~400ms finality, <$0.001 fee                       | Identical base Solana |
+|                      |                                                    | speed & minimal fees  |
+| Auditability         | Global public exposure                             | Selective disclosure  |
+|                      |                                                    | via viewing key export|
++----------------------+----------------------------------------------------+-----------------------+

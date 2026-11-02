@@ -1,273 +1,208 @@
+// File: /programs/stealf-core/src/lib.rs
 use anchor_lang::prelude::*;
-use anchor_lang::system_program::{transfer, Transfer};
+use anchor_lang::system_program;
 
-declare_id!("St1fXk24MGeA11vFvC6aV4h1QxZ9y8kC9tP7N3D8mN1");
+declare_id!("StEALF1111111111111111111111111111111111111");
 
-pub const ANNOUNCEMENT_SEED: &[u8] = b"announcement";
-pub const VAULT_SEED: &[u8] = b"vault";
-pub const REGISTRY_SEED: &[u8] = b"registry";
+pub const VIEW_TAG_SIZE: usize = 1;
+pub const COMPRESSED_PUBKEY_SIZE: usize = 32;
 
 #[program]
-pub mod stealf {
+pub mod stealf_core {
     use super::*;
 
-    /// Register a user's persistent Spending and Viewing public keys.
-    pub fn register_keys(
-        ctx: Context<RegisterKeys>,
-        spending_pubkey: [u8; 32],
-        viewing_pubkey: [u8; 32],
+    /// Registers a user's dual-key stealth meta-address.
+    pub fn register_meta_address(
+        ctx: Context<RegisterMetaAddress>,
+        spend_pubkey: [u8; 32],
+        view_pubkey: [u8; 32],
     ) -> Result<()> {
-        let registry = &mut ctx.accounts.registry;
-        registry.owner = ctx.accounts.owner.key();
-        registry.spending_pubkey = spending_pubkey;
-        registry.viewing_pubkey = viewing_pubkey;
-        registry.bump = ctx.bumps.registry;
+        let registry = &mut ctx.accounts.stealth_meta_address;
+        registry.owner = ctx.accounts.authority.key();
+        registry.spend_pubkey = spend_pubkey;
+        registry.view_pubkey = view_pubkey;
+        registry.bump = ctx.bumps.stealth_meta_address;
+        registry.registered_at = Clock::get()?.unix_timestamp;
 
-        emit!(KeysRegisteredEvent {
+        emit!(MetaAddressRegisteredEvent {
             owner: registry.owner,
-            spending_pubkey,
-            viewing_pubkey,
+            spend_pubkey,
+            view_pubkey,
+            timestamp: registry.registered_at,
         });
 
         Ok(())
     }
 
-    /// Senders transfer SOL to the stealth vault PDA and emit the ephemeral pubkey (R).
-    pub fn transfer_stealth_sol(
-        ctx: Context<TransferStealthSol>,
-        stealth_recipient: Pubkey,
+    /// Dispatches an announcement containing the ephemeral public key, view-tag,
+    /// and destination stealth address. Sender transfers SOL directly to the derived stealth address.
+    pub fn send_stealth_sol(
+        ctx: Context<SendStealthSol>,
         ephemeral_pubkey: [u8; 32],
+        view_tag: u8,
+        stealth_recipient: Pubkey,
         amount: u64,
     ) -> Result<()> {
-        require!(amount > 0, StealfError::InvalidZeroAmount);
+        require!(amount > 0, StealfError::InvalidTransferAmount);
+        require!(
+            ctx.accounts.stealth_recipient.key() == stealth_recipient,
+            StealfError::RecipientMismatch
+        );
 
-        // Record announcement state
-        let announcement = &mut ctx.accounts.announcement;
-        announcement.stealth_address = stealth_recipient;
-        announcement.ephemeral_pubkey = ephemeral_pubkey;
-        announcement.sender = ctx.accounts.sender.key();
-        announcement.amount = amount;
-        announcement.claimed = false;
-        announcement.bump = ctx.bumps.announcement;
-        announcement.vault_bump = ctx.bumps.vault;
-
-        // Move funds from sender to deterministic stealth vault PDA
+        // Native SOL transfer directly from sender to the derived stealth address
         let cpi_context = CpiContext::new(
             ctx.accounts.system_program.to_account_info(),
-            Transfer {
+            system_program::Transfer {
                 from: ctx.accounts.sender.to_account_info(),
-                to: ctx.accounts.vault.to_account_info(),
+                to: ctx.accounts.stealth_recipient.to_account_info(),
             },
         );
-        transfer(cpi_context, amount)?;
+        system_program::transfer(cpi_context, amount)?;
 
-        emit!(StealthPaymentSentEvent {
-            sender: ctx.accounts.sender.key(),
-            stealth_address: stealth_recipient,
+        // Record announcement on-chain for off-chain scanning nodes
+        let announcement = &mut ctx.accounts.announcement;
+        announcement.sender = ctx.accounts.sender.key();
+        announcement.stealth_recipient = stealth_recipient;
+        announcement.ephemeral_pubkey = ephemeral_pubkey;
+        announcement.view_tag = view_tag;
+        announcement.amount = amount;
+        announcement.slot = Clock::get()?.slot;
+        announcement.timestamp = Clock::get()?.unix_timestamp;
+
+        emit!(StealthAnnouncementEvent {
+            sender: announcement.sender,
+            stealth_recipient,
             ephemeral_pubkey,
+            view_tag,
             amount,
+            timestamp: announcement.timestamp,
         });
 
         Ok(())
     }
 
-    /// Claim the funds accumulated in the stealth vault.
-    /// The signer must be the derived stealth keypair holder or authorized authority.
-    pub fn claim_stealth_sol(ctx: Context<ClaimStealthSol>) -> Result<()> {
-        let announcement = &mut ctx.accounts.announcement;
-        require!(!announcement.claimed, StealfError::AlreadyClaimed);
-
-        let stealth_address = announcement.stealth_address;
-        require_keys_eq!(
-            ctx.accounts.stealth_signer.key(),
-            stealth_address,
-            StealfError::UnauthorizedClaimer
-        );
-
-        let vault_balance = ctx.accounts.vault.lamports();
-        require!(vault_balance > 0, StealfError::InsufficientVaultFunds);
-
-        // Mark as claimed to prevent re-entrancy
-        announcement.claimed = true;
-
-        let vault_bump = announcement.vault_bump;
-        let seeds: &[&[u8]] = &[
-            VAULT_SEED,
-            stealth_address.as_ref(),
-            &[vault_bump],
-        ];
-        let signer_seeds = &[seeds];
-
-        // Drain vault lamports to destination
-        let cpi_context = CpiContext::new_with_signer(
-            ctx.accounts.system_program.to_account_info(),
-            Transfer {
-                from: ctx.accounts.vault.to_account_info(),
-                to: ctx.accounts.destination.to_account_info(),
-            },
-            signer_seeds,
-        );
-        transfer(cpi_context, vault_balance)?;
-
-        // Close announcement account to reclaim rent back to destination
-        let destination_info = ctx.accounts.destination.to_account_info();
-        let announcement_info = ctx.accounts.announcement.to_account_info();
-
-        let rent_lamports = announcement_info.lamports();
-        **announcement_info.lamports.borrow_mut() = 0;
-        **destination_info.lamports.borrow_mut() = destination_info
-            .lamports()
-            .checked_add(rent_lamports)
-            .ok_or(StealfError::NumericalOverflow)?;
-
-        emit!(StealthClaimedEvent {
-            stealth_address,
-            destination: ctx.accounts.destination.key(),
-            amount: vault_balance,
-        });
-
+    /// Allows the authority to close their registry entry and reclaim rent.
+    pub fn close_registry(_ctx: Context<CloseRegistry>) -> Result<()> {
         Ok(())
     }
 }
 
 // -----------------------------------------------------------------------------
-// Account Contexts
+// ACCOUNT VALIDATION CONTEXTS
 // -----------------------------------------------------------------------------
 
 #[derive(Accounts)]
-pub struct RegisterKeys<'info> {
+pub struct RegisterMetaAddress<'info> {
     #[account(
-        init_if_needed,
-        payer = owner,
-        space = 8 + UserRegistry::INIT_SPACE,
-        seeds = [REGISTRY_SEED, owner.key().as_ref()],
+        init,
+        payer = authority,
+        space = 8 + StealthMetaAddress::INIT_SPACE,
+        seeds = [b"stealth_meta", authority.key().as_ref()],
         bump
     )]
-    pub registry: Account<'info, UserRegistry>,
+    pub stealth_meta_address: Account<'info, StealthMetaAddress>,
 
     #[account(mut)]
-    pub owner: Signer<'info>,
+    pub authority: Signer<'info>,
 
     pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
-#[instruction(stealth_recipient: Pubkey)]
-pub struct TransferStealthSol<'info> {
-    #[account(
-        init,
-        payer = sender,
-        space = 8 + Announcement::INIT_SPACE,
-        seeds = [ANNOUNCEMENT_SEED, stealth_recipient.as_ref()],
-        bump
-    )]
-    pub announcement: Account<'info, Announcement>,
-
-    /// CHECK: Vault PDA derived deterministically via seeds [b"vault", stealth_recipient.as_ref()]
-    #[account(
-        mut,
-        seeds = [VAULT_SEED, stealth_recipient.as_ref()],
-        bump
-    )]
-    pub vault: SystemAccount<'info>,
-
+#[instruction(ephemeral_pubkey: [u8; 32], view_tag: u8, stealth_recipient: Pubkey)]
+pub struct SendStealthSol<'info> {
     #[account(mut)]
     pub sender: Signer<'info>,
 
+    /// CHECK: Validated against recipient parameter. Recipient is derived off-chain via ECDH.
+    #[account(mut)]
+    pub stealth_recipient: AccountInfo<'info>,
+
+    #[account(
+        init,
+        payer = sender,
+        space = 8 + AnnouncementRecord::INIT_SPACE,
+        seeds = [
+            b"announcement",
+            sender.key().as_ref(),
+            &Clock::get().unwrap().slot.to_le_bytes()
+        ],
+        bump
+    )]
+    pub announcement: Account<'info, AnnouncementRecord>,
+
     pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
-pub struct ClaimStealthSol<'info> {
+pub struct CloseRegistry<'info> {
     #[account(
         mut,
-        seeds = [ANNOUNCEMENT_SEED, stealth_signer.key().as_ref()],
-        bump = announcement.bump,
-        has_one = stealth_address @ StealfError::InvalidStealthAddress
+        close = authority,
+        seeds = [b"stealth_meta", authority.key().as_ref()],
+        bump = stealth_meta_address.bump,
+        has_one = authority @ StealfError::UnauthorizedCaller
     )]
-    pub announcement: Account<'info, Announcement>,
+    pub stealth_meta_address: Account<'info, StealthMetaAddress>,
 
-    /// CHECK: PDA holding the locked funds.
-    #[account(
-        mut,
-        seeds = [VAULT_SEED, stealth_signer.key().as_ref()],
-        bump = announcement.vault_bump
-    )]
-    pub vault: SystemAccount<'info>,
-
-    /// Signer must be the derived stealth keypair
-    pub stealth_signer: Signer<'info>,
-
-    /// Target address receiving the balance and recovered rent
     #[account(mut)]
-    pub destination: SystemAccount<'info>,
-
-    pub system_program: Program<'info, System>,
+    pub authority: Signer<'info>,
 }
 
 // -----------------------------------------------------------------------------
-// State Structs
+// STATE SCHEMAS
 // -----------------------------------------------------------------------------
 
 #[account]
 #[derive(InitSpace)]
-pub struct UserRegistry {
+pub struct StealthMetaAddress {
     pub owner: Pubkey,
-    pub spending_pubkey: [u8; 32],
-    pub viewing_pubkey: [u8; 32],
+    pub spend_pubkey: [u8; 32],
+    pub view_pubkey: [u8; 32],
+    pub registered_at: i64,
     pub bump: u8,
 }
 
 #[account]
 #[derive(InitSpace)]
-pub struct Announcement {
-    pub stealth_address: Pubkey,
-    pub ephemeral_pubkey: [u8; 32],
+pub struct AnnouncementRecord {
     pub sender: Pubkey,
+    pub stealth_recipient: Pubkey,
+    pub ephemeral_pubkey: [u8; 32],
     pub amount: u64,
-    pub claimed: bool,
-    pub bump: u8,
-    pub vault_bump: u8,
+    pub slot: u64,
+    pub timestamp: i64,
+    pub view_tag: u8,
 }
 
 // -----------------------------------------------------------------------------
-// Events & Errors
+// EVENTS & ERRORS
 // -----------------------------------------------------------------------------
 
 #[event]
-pub struct KeysRegisteredEvent {
+pub struct MetaAddressRegisteredEvent {
     pub owner: Pubkey,
-    pub spending_pubkey: [u8; 32],
-    pub viewing_pubkey: [u8; 32],
+    pub spend_pubkey: [u8; 32],
+    pub view_pubkey: [u8; 32],
+    pub timestamp: i64,
 }
 
 #[event]
-pub struct StealthPaymentSentEvent {
+pub struct StealthAnnouncementEvent {
     pub sender: Pubkey,
-    pub stealth_address: Pubkey,
+    pub stealth_recipient: Pubkey,
     pub ephemeral_pubkey: [u8; 32],
+    pub view_tag: u8,
     pub amount: u64,
-}
-
-#[event]
-pub struct StealthClaimedEvent {
-    pub stealth_address: Pubkey,
-    pub destination: Pubkey,
-    pub amount: u64,
+    pub timestamp: i64,
 }
 
 #[error_code]
 pub enum StealfError {
-    #[msg("Transfer amount must be greater than zero.")]
-    InvalidZeroAmount,
-    #[msg("The stealth funds have already been claimed.")]
-    AlreadyClaimed,
-    #[msg("Signer does not match the stealth target address.")]
-    UnauthorizedClaimer,
-    #[msg("No lamports available in stealth vault.")]
-    InsufficientVaultFunds,
-    #[msg("Stealth address mismatch.")]
-    InvalidStealthAddress,
-    #[msg("Arithmetic overflow occurred during balance calculation.")]
-    NumericalOverflow,
+    #[msg("Invalid transfer amount. Must be greater than zero.")]
+    InvalidTransferAmount,
+    #[msg("Stealth recipient account address does not match provided parameter.")]
+    RecipientMismatch,
+    #[msg("Signer does not have authority to close this stealth registry.")]
+    UnauthorizedCaller,
 }

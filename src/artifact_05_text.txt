@@ -1,0 +1,7 @@
+client/
+├── package.json
+├── tsconfig.json
+└── src/
+    ├── crypto.ts
+    ├── index.ts
+    └── notifier.ts

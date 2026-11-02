@@ -1,0 +1,7 @@
+stealf-agent/
+├── package.json
+├── tsconfig.json
+└── src/
+    ├── crypto.ts
+    ├── cli.ts
+    └── scanner.ts

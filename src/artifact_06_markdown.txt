@@ -1,0 +1,33 @@
+### 0:00 - 0:25 | The Problem: Total On-Chain Visibility
+[Visual: Screen recording of Solscan showing an executive wallet receiving a payroll transfer, instantly exposing their balances, token holdings, and protocol trades.]
+Narrator (Spoken):
+"Solana is the fastest global economic engine, but transparency is destroying user privacy. 
+A single merchant checkout, tip, or DAO disbursement links your public wallet to every transaction 
+you have ever made or will ever make. Mixers fail because they are slow, heavily blacklisted, 
+and drain compute units. Welcome to Stealf."
+
+### 0:25 - 0:55 | The Innovation: Ephemeral Dual-Key Stealth Address Protocol (DKSAP)
+[Visual: High-resolution animation of the Mermaid diagram. Highlighting the 1-byte View Tag filtering and PDA generation.]
+Narrator (Spoken):
+"Stealf brings non-linkable, zero-interaction stealth addresses to the Solana Virtual Machine. 
+Instead of sending funds to Bob's public address, Alice derives a one-time ephemeral public key 
+combined with Bob's dual-key meta address. Using Curve25519 Diffie-Hellman derivation, 
+Alice deposits directly into an isolated vault PDA. Observers on Solscan see only a dynamic, single-use 
+ephemeral address. Bob's identity remains completely invisible."
+
+### 0:55 - 1:30 | Technical Execution: Live Localnet Run & View-Tag Scanning
+[Visual: Terminal executing `anchor test`. Clean green checks passing for payment, view-tag matching, sweep, and attack defense.]
+Narrator (Spoken):
+"Here is the localnet test execution. Notice the performance: Alice deposits SOL and emits a 
+1-byte View Tag in an on-chain event. For Bob, scanning Solana blocks is computationally trivial: 
+the View Tag eliminates 99.6% of non-matching transactions without computing expensive point multiplications. 
+When a match occurs, Bob reconstructs the private key off-chain, signs the sweep instruction, 
+and drains the vault into a completely fresh burner address—reclaiming all rent in under 20,000 Compute Units."
+
+### 1:30 - 2:00 | Why Stealf Wins 1st Place
+[Visual: Split screen of CU consumption metrics (<25,000 CU) and real-time frontend prototype showing instantaneous, unlinked settlement.]
+Narrator (Spoken):
+"Stealf does not rely on off-chain liquidity pools, does not require complex ZK-circuits that 
+exhaust transaction limits, and leaves zero residual rent on-chain. It is pure, mathematically sound, 
+SVM-native privacy that satisfies global compliance while protecting user sovereignty. 
+Stealf is the missing privacy primitive for Solana."

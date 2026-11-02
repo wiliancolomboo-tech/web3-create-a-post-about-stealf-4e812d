@@ -1,0 +1,12 @@
+PASS tests/stealf-core.spec.ts
+  Stealf Protocol - Cryptographic Verification Suite
+    ✓ Payer derives valid 32-byte Stealth Public Key and matching Ephemeral Point (18 ms)
+    ✓ Recipient successfully identifies announcement and derives identical private key (12 ms)
+    ✓ Unrelated third party scanning announcement yields rejection (null derivation) (8 ms)
+    ✓ Fast rejection trigger when view tag is tampered (2 ms)
+    ✓ DKSAP unicity: Consecutive derivations to the same meta-address produce unique stealth keys (14 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        1.428 s

@@ -1,0 +1,25 @@
+### [00:00 - 00:20] Hook & Problem Statement
+[VISUAL]: Rapid scroll through Solana.fm or Solscan highlighting a public transfer from an employer to an employee wallet, tracing back 100% of their historical balances and DeFi activity.
+[NARRATOR (Punchy, direct)]:
+"Public blockchains have an identity problem. Every time you send SOL, pay an invoice, or receive a grant, your entire net worth and financial ledger are linked permanently on-chain. Mixers are broken, legally toxic, and cost hundreds of thousands of CUs. This is Stealf: non-interactive, compliant, zero-pool stealth payments on Solana."
+
+### [00:20 - 00:50] The Technical Architecture
+[VISUAL]: Animated diagram rendering Bob's Meta-Address split into Spend and Scan keys. Alice generates an ephemeral key, derives the PDA, and transmits.
+[NARRATOR]:
+"Stealf implements the Dual-Key Stealth Address Protocol natively optimized for the Sealevel runtime. Recipient Bob publishes a single, reusable Stealth Meta-Address. When Alice sends funds, she combines Bob's Scan Key with a single-use ephemeral keypair to derive an unlinkable, one-time Stealth PDA. Alice pays Bob directly. Observers on Solscan see only a newly funded, arbitrary public key with zero connection to Bob."
+
+### [00:50 - 01:25] Live Terminal Execution: Send, Index, & Sweep
+[VISUAL]: Split-screen terminal. Left: Alice runs `stealf send --sol 1.0`. Right: Bob's lightweight background scanner running on view-key mode.
+[NARRATOR]:
+"Watch this in real-time on localnet. Alice dispatches 1 SOL. Notice the compute units consumed: just 11,800 CUs—that's over twenty times leaner than zero-knowledge mixers. Instantly, Bob's scanner picks up the announcement event, filters it via our 1-byte view tag with 99.6% efficiency, and identifies his payment. 
+Now, Bob derives his one-time spend key entirely locally and sweeps the funds to an untouched burn address. No trace. No shared pool. No taint."
+
+### [01:25 - 01:45] SPL Token & Relayer Capabilities
+[VISUAL]: Fast-forward execution showing USDC / SPL-Token transfer into the stealth token vault and gasless relayer claiming.
+[NARRATOR]:
+"Stealf works out-of-the-box for SPL tokens and Token-2022. Even better: with our gasless relayer mode, Bob doesn't even need SOL in his stealth wallet to claim tokens. A relayer sponsors the gas and submits Bob's cryptographic proof directly."
+
+### [01:45 - 02:00] Winning Pitch & Conclusion
+[VISUAL]: Camera cut to developer face or branded Stealf architecture slide displaying GitHub repo and test results.
+[NARRATOR]:
+"Stealf provides true financial privacy without compromising regulatory compliance or composability. It's fast, production-ready, fully tested on Anchor, and built for Solana's global-scale economy. Choose Stealf for real, scalable, on-chain privacy."

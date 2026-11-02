@@ -1,0 +1,8 @@
+{
+  "status": "healthy",
+  "synced_slot": 274819200,
+  "rpc_latency_ms": 38,
+  "active_meta_addresses_monitored": 14,
+  "total_announcements_processed": 10542,
+  "view_tag_fast_filter_rate": "99.61%"
+}

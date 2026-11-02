@@ -1,0 +1,10 @@
+{
+  "level": "info",
+  "timestamp": "2025-05-18T10:15:30.123Z",
+  "component": "stealf-scanner",
+  "event": "HEARTBEAT",
+  "slot_height": 284192019,
+  "status": "HEALTHY",
+  "processed_announcements": 1420,
+  "matches_detected": 12
+}

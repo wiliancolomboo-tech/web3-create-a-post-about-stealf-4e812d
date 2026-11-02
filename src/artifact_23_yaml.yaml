@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  stealf-sentinel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stealf_sentinel_worker
+    restart: always
+    environment:
+      - SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+      - STEALF_PROGRAM_ID=Stea1fXwLg9kYxK8yJ8Hk2g8RzP7aQeT8QvKxM1nB9Y
+      - RECIPIENT_VIEW_PRIVKEY=${RECIPIENT_VIEW_PRIVKEY}
+      - RECIPIENT_SPEND_PUBKEY=${RECIPIENT_SPEND_PUBKEY}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - ALERT_EMAIL_RECIPIENT=treasury-ops@enterprise.corp
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"

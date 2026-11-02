@@ -1,0 +1,30 @@
++-----------------------------------------------------------------------------------------+
+|                                STEALF TOPOLOGY OVERVIEW                                 |
++-----------------------------------------------------------------------------------------+
+                                                                                           
+ [ Enterprise Sender ]                                                                     
+          |                                                                                
+          +---> [ Solana RPC Cluster ]                                                     
+                       |                                                                   
+                       +---> [ Stealf Anchor Program: 5t3a1f... ]                         
+                       |         |                                                         
+                       |         +---> Emits Announcement (Ephemeral R, View Tag, Cipher)  
+                       |         +---> Routes Sol / SPL to Derived One-Time Key (P)        
+                       |                                                                   
+ [ Stealf Scanning Daemon ] <--- (Websocket / Yellowstone Geyser Stream)                   
+          |                                                                                
+          +---> [ Fast Filter Engine (ViewTag == S[0]) ]                                   
+          |            |                                                                   
+          |            v (Match Found: 1 in 256)                                           
+          +---> [ Curve25519 Edwards Scalar Derivation ]                                   
+          |            |                                                                   
+          |            v (Stealth Key Verified)                                            
+          +---> [ Safe Vault Sweep Engine ]                                                
+          |            |                                                                   
+          |            +---> Submits Sweep TX (p_stealth signs)                            
+          |                                                                                
+          +---> [ Enterprise Notification Adapter ]                                        
+                       |                                                                   
+                       +---> Discord Webhook Alert                                         
+                       +---> Resend Corporate Email Dispatch                               
+                       +---> Prometheus / OpenTelemetry Metrics

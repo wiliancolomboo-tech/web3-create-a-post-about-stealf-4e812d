@@ -1,0 +1,7 @@
+{
+  "status": "HEALTHY",
+  "uptime_seconds": 84120,
+  "last_processed_slot": 298410291,
+  "rpc_connected": true,
+  "active_subscriptions": 1
+}

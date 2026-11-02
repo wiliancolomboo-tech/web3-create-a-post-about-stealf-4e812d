@@ -1,0 +1,13 @@
+1. KEY GENERATION & STORAGE
+   - Generate production meta-keys on an air-gapped machine using `stealf gen-meta-keys`.
+   - Never expose `spendPrivateKey` to online scanning daemons.
+   - The daemon container only requires read access to `viewPrivateKey` and `spendPublicKey` for detection.
+
+2. LOG SURVEILLANCE & RECOVERY
+   - Monitor scanner health via:
+     docker logs -f stealf_daemon_worker
+   - If an RPC disconnection occurs, the WebSocket auto-reconnects with exponential backoff (1s -> 30s max).
+
+3. SWEEPING STEALTH BALANCES TO COLD VAULTS
+   - When an inbound payment alert is received, compute the one-time private key using `checkAndDeriveSpendingKey`.
+   - Execute a standard native SOL / SPL transfer instruction signing with the derived key.

@@ -1,0 +1,10 @@
++----------------------------------------------------------------------------------------------------+
+|                                    STEALF SPECIFICATION MATRIX                                     |
++--------------------------+-------------------------------------------------------------------------+
+| Target Ecosystem         | Solana (Sealevel Engine, SVM, Anchor Framework)                         |
+| Cryptographic Primitive  | Dual-Key Stealth Address Protocol (DKSAP) over Ed25519/Curve25519       |
+| Filter Mechanism         | 1-Byte Blake3 View-Tag (Reduces Scanning CPU load by 99.6%)             |
+| On-Chain Footprint       | Fixed Announcement PDA with dynamic encrypted payload bounds (<=128 B)  |
+| Transaction Model        | Gasless Sweeping via Decoupled Relayer Execution Instructions           |
+| Enterprise Integrations  | Webhooks (Discord, Slack), Transaction Streamers (Geyser/WebSocket RPC) |
++--------------------------+-------------------------------------------------------------------------+

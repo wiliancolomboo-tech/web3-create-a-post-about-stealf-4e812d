@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  stealf-daemon:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stealf-scanner-agent
+    restart: always
+    environment:
+      - SOLANA_RPC_URL=https://api.devnet.solana.com
+      - PROGRAM_ID=Steaf11111111111111111111111111111111111111
+      - VIEW_PRIVATE_KEY=${VIEW_PRIVATE_KEY}
+      - SPEND_PRIVATE_KEY=${SPEND_PRIVATE_KEY}
+      - DISCORD_SLACK_WEBHOOK_URL=${DISCORD_SLACK_WEBHOOK_URL}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - ALERT_DISPATCH_EMAIL=${ALERT_DISPATCH_EMAIL}
+      - PORT=8080
+    ports:
+      - "8080:8080"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"

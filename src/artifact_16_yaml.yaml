@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  stealf-daemon:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stealf-indexer
+    restart: always
+    environment:
+      - SOLANA_RPC_URL=https://api.devnet.solana.com
+      - STEALF_PROGRAM_ID=Steaf11111111111111111111111111111111111111
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - RESEND_ALERT_EMAIL=${RESEND_ALERT_EMAIL}
+    command: ["node", "dist/cli.js", "scan"]

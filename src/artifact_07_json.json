@@ -1,0 +1,22 @@
+{
+  "name": "@stealf/sdk",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "scan": "ts-node src/cli.ts scan",
+    "send": "ts-node src/cli.ts send"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.29.0",
+    "@noble/curves": "^1.3.0",
+    "@noble/hashes": "^1.3.3",
+    "@solana/web3.js": "^1.87.6",
+    "axios": "^1.6.5",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  }
+}

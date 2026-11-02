@@ -1,0 +1,23 @@
+[toolchain]
+anchor_version = "0.30.1"
+solana_version = "1.18.26"
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.localnet]
+stealf_core = "SteLfx4vN76B9M1vA5WwK3x5F2qX8U9j1vE3m7k9YpQ"
+
+[programs.devnet]
+stealf_core = "SteLfx4vN76B9M1vA5WwK3x5F2qX8U9j1vE3m7k9YpQ"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "devnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "yarn run ts-node ./node_modules/mocha/bin/mocha -r ts-node/register 'tests/**/*.ts' --timeout 60000"

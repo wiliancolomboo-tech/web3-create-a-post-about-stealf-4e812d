@@ -1,0 +1,1 @@
+docker inspect --format='{{json .State.Health}}' stealf-scanner-daemon

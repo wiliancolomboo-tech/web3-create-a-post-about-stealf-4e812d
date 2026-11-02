@@ -1,0 +1,8 @@
+We've open-sourced the complete enterprise-ready Stealf stack:
+🛡️ Auditable @AnchorLang smart contract
+🛠️ High-speed TypeScript scanner daemon
+📬 Real-time @resend / Discord alerting mesh
+🐳 Turnkey 1-click Docker container
+
+Building the standard for corporate privacy on Solana.
+Check out the repo & run your scanner: https://github.com/stealf-protocol/stealf-core

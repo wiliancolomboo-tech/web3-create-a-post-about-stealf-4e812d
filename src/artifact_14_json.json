@@ -1,0 +1,7 @@
+{
+  "status": "HEALTHY",
+  "connected_cluster": "devnet",
+  "processed_slots": 29841284,
+  "detected_stealth_receipts": 42,
+  "timestamp": "2025-05-18T10:00:00Z"
+}

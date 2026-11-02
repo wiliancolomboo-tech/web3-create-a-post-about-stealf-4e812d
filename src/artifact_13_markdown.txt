@@ -1,0 +1,20 @@
+🧵 1/3: Public blockchains don't have to mean public bankruptcies or doxxed treasuries. 
+
+Introducing our deep-dive implementation of @Stealf — bringing true Dual-Key Stealth Addresses (DKSAP) to @Solana at microsecond execution speeds. 🛡️⚡
+
+Here's how non-interactive privacy changes the game: 👇
+
+---
+
+🧵 2/3: Under the hood:
+• Recipient shares ONE reusable meta-address (Spend + View keys).
+• Sender derives a fresh, mathematically unlinkable Curve25519 stealth PDA per transfer.
+• Recipient reconstructs the private key off-chain via Diffie-Hellman secret exchange. Zero address reuse. Zero metadata leakage.
+
+---
+
+🧵 3/3: Built with production @coral_xyz Anchor, sub-second WebSocket indexing, and enterprise alerting via @resend and Slack webhooks.
+
+Self-hostable, gas-optimized, and battle-tested for institutional Solana payroll & private OTC flow.
+
+Check out the full open-source repo & technical architecture! 🚀🦀 #Solana #Privacy #Stealf

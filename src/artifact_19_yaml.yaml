@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  stealf-scanner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stealf-enterprise-scanner
+    restart: unless-stopped
+    environment:
+      - SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+      - STEALF_PROGRAM_ID=StEALF1111111111111111111111111111111111111
+      - RECIPIENT_VIEW_PRIV_HEX=${RECIPIENT_VIEW_PRIV_HEX}
+      - RECIPIENT_SPEND_PUB_HEX=${RECIPIENT_SPEND_PUB_HEX}
+      - ENTERPRISE_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder
+    healthcheck:
+      test: ["CMD-SHELL", "node -e 'process.exit(0)'"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"

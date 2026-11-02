@@ -1,0 +1,7 @@
+client/
+├── package.json
+├── tsconfig.json
+└── src/
+    ├── crypto.ts
+    ├── notifications.ts
+    └── stealf-cli.ts

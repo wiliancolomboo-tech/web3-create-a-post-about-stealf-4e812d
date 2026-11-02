@@ -1,0 +1,5 @@
+4/6 🏛️ Selective Compliance:
+
+Unlike mixers that risk OFAC blacklisting, Stealf features dual-key separation:
+🔑 Viewing Key: Decrypts transaction histories for auditors and tax compliance.
+🔐 Spending Key: Kept air-gapped in cold storage to authorize asset sweeps.

@@ -1,0 +1,5 @@
+2/6 ⚙️ How it works under the hood:
+
+Instead of sending SOL/SPL directly to a static public address, the payer derives a one-time unlinkable ephemeral address on-chain using elliptic-curve Diffie-Hellman (ECDH).
+
+Result: The payment lands in an address only the recipient can unlock.

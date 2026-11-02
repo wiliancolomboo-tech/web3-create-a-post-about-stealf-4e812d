@@ -1,0 +1,7 @@
+STEALF PROTOCOL VALUE MULTIPLIERS
+┌────────────────────────────────┬────────────────────────────────┬───────────────────────────────┐
+│     CONFIDENTIAL PAYROLL       │       PRIVATE COMMERCE         │       DAO DISBURSEMENTS       │
+│  Pay 10,000 global contractors │  Receive customer payments     │  Distribute grants & bounties │
+│  without leaking compensation  │  without revealing turnover or │  without exposing contributor │
+│  schedules or employee wallets.│  supplier transaction graphs.  │  identities to competitors.   │
+└────────────────────────────────┴────────────────────────────────┴───────────────────────────────┘

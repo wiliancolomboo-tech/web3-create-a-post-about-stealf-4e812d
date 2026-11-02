@@ -1,0 +1,15 @@
+# Solana RPC Cluster Endpoints
+SOLANA_RPC_URL=https://api.devnet.solana.com
+SOLANA_WS_URL=wss://api.devnet.solana.com
+STEALF_PROGRAM_ID=St1f111111111111111111111111111111111111111
+
+# Recipient Credentials (Hex Encoded 32-byte Scalars)
+STEALF_SCAN_PRIVKEY=4a8a68b5a7a7d4a13e5b1285be26e8574747514a68fcf9a3e6a987d65b123456
+STEALF_SPEND_PRIVKEY=8b7a68c5d7e7f4a13e5b1285be26e8574747514a68fcf9a3e6a987d65babcdef
+STEALF_TREASURY_SWEEP_ADDRESS=SafeVault11111111111111111111111111111111111
+
+# Enterprise Webhook & Notification Relays
+STEALF_DISCORD_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder
+STEALF_SLACK_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder
+RESEND_API_KEY=re_1234567890
+STEALF_ALERT_EMAIL=treasury-ops@enterprise.org

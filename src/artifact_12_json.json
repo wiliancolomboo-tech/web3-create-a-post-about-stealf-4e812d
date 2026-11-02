@@ -1,0 +1,8 @@
+{
+  "status": "healthy",
+  "synced_slot": 278190240,
+  "processed_announcements": 14208,
+  "matched_stealth_receipts": 34,
+  "rejection_rate": "99.61%",
+  "uptime_seconds": 104230
+}

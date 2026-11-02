@@ -1,0 +1,10 @@
+SOLANA_RPC_URL=https://api.devnet.solana.com
+STEALF_PROGRAM_ID=Stea1fXGfW2zWp1kKjF8gN5C6e9zM3mY4x7V1b8Q2jR
+VIEW_PRIV_KEY=e4d2a1b9c8... # 64-char hex scalar
+SPEND_PUB_KEY=4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R
+SPEND_PRIV_KEY= # Optional for scan-only nodes
+COLD_STORAGE_TARGET=7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU
+RESEND_API_KEY=re_123456789
+ALERT_EMAIL=finance@corporate.com
+SLACK_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder
+PORT=8080

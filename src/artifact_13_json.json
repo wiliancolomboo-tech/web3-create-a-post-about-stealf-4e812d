@@ -1,0 +1,27 @@
+{
+  "name": "stealf-client",
+  "version": "1.0.0",
+  "description": "Enterprise CLI & Automation Scanner Daemon for Stealf on Solana",
+  "main": "dist/stealf-cli.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/stealf-cli.ts",
+    "scan": "ts-node src/stealf-cli.ts scan --watch"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.30.1",
+    "@noble/curves": "^1.4.0",
+    "@noble/hashes": "^1.4.0",
+    "@solana/spl-token": "^0.4.8",
+    "@solana/web3.js": "^1.95.3",
+    "commander": "^12.1.0",
+    "dotenv": "^16.4.5",
+    "node-fetch": "^2.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "@types/node-fetch": "^2.6.11",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.2"
+  }
+}

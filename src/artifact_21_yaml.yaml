@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  stealf-sentinel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stealf-sentinel-daemon
+    restart: unless-stopped
+    environment:
+      - SOLANA_RPC_URL=https://api.devnet.solana.com
+      - STEALF_PROGRAM_ID=Stea1f1111111111111111111111111111111111111
+      - MY_VIEW_PRIV_KEY_HEX=6a3f910408544e45d8b762acde11b51e50529e844b26715fba45c55737e96bbf
+      - MY_SPEND_PUB_KEY_HEX=01a4e10708544e45d8b762acde11b51e50529e844b26715fba45c55737e96bcc
+      - DISCORD_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder
+      - SLACK_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"

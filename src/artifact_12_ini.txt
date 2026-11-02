@@ -1,0 +1,11 @@
+# Solana Network Configuration
+SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+STEALF_PROGRAM_ID=St1fH3K12Yx6Lw3t2fUfR8mK9x9mC9dGZpQ8yGvRjWp
+
+# Off-chain Agent Keying (Hex Scalars)
+RECIPIENT_VIEW_KEY=7c957fb6210302fd223804c15e006ecc3a652a37b6f418ec69f3b7546da13d06
+RECIPIENT_SPEND_KEY=ba8251e6046e39268383cf5ef7b952f4a43475d40db90eb9ab285a21e0586e92
+COLD_VAULT_ADDRESS=CorpVault4111111111111111111111111111111111111
+
+# Enterprise Telemetry
+ENTERPRISE_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder

@@ -1,0 +1,7 @@
+# Anchor.toml configuration snippet
+[programs.localnet]
+stealf = "<YOUR_PROGRAM_ID>"
+
+[provider]
+cluster = "Localnet"
+wallet = "~/.config/solana/id.json"

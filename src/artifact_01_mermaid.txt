@@ -1,44 +1,27 @@
 flowchart TD
-    subgraph ClientLayer["Off-Chain Client Layer"]
-        Sender["Sender Wallet<br/>(Signs with Ephemeral Keypair r, R)"]
-        Recipient["Recipient Worker / Client<br/>(Continuous Scanner with Viewing PrivKey v)"]
+    subgraph Recipient ["Receiver (Bob)"]
+        B1["Generate Meta-Address Keypair<br/>Spend Key (k_spend, K_spend)<br/>View Key (k_view, K_view)"] --> B2["Register Meta-Address on-chain<br/>Stealf Registry Program"]
+        B3["Off-chain Scanning Client<br/>Listening to Announcement Events"]
     end
 
-    subgraph ProgramLayer["Stealf On-Chain Core Protocol (Anchor Engine)"]
-        subgraph RegistrySection["1. Registry State"]
-            RegRegistry["Stealth Meta-Registry PDA<br/>seeds=['registry', owner_pubkey]<br/>Stores: K_spend, K_view"]
-        end
-
-        subgraph TransferSection["2. Settlement & Announcement"]
-            AnnouncementPDA["Announcement Record PDA<br/>seeds=['announcement', stealth_address]<br/>Stores: Ephemeral Pubkey R, Metadata, Nonce"]
-            StealthEscrowPDA["Stealth Escrow Vault PDA<br/>seeds=['vault', stealth_address]<br/>Holds Native SOL / SPL Tokens"]
-        end
-
-        subgraph ValidationGuards["3. Security & Validation Boundary"]
-            SignerCheck{"Constraint:<br/>Is Caller Authorized / Signed?"}
-            ReentrancyGuard{"State Flag:<br/>Account Status == UNCLAIMED"}
-            SeedDerivation{"Constraint Check:<br/>stealth_address == H(S, K_spend)"}
-        end
+    subgraph Sender ["Sender (Alice)"]
+        A1["Fetch Bob's Meta-Address<br/>(K_spend, K_view)"] --> A2["Generate Ephemeral Keypair (r, R)<br/>R = r * G"]
+        A2 --> A3["Compute Shared Secret<br/>S = r * K_view"]
+        A3 --> A4["Derive View Tag<br/>vt = SHA256(S)[0]"]
+        A4 --> A5["Derive Stealth Address<br/>P_stealth = K_spend + H(S)*G"]
+        A5 --> A6["Execute On-Chain Tx:<br/>1. Send SOL/SPL to P_stealth<br/>2. Post Announcement(R, vt, P_stealth)"]
     end
 
-    subgraph LedgerCPI["Solana System / Token Program"]
-        SystemProgram["System Program / SPL Token Program"]
+    subgraph SolanaLedger ["Solana High-Speed Ledger"]
+        A6 --> SL1["Stealf Announcement Account / Event"]
+        A6 --> SL2["P_stealth Account Credited"]
     end
 
-    %% Sender Flow
-    Sender -->|"1. Query Keys (K_spend, K_view)"| RegRegistry
-    Sender -->|"2. Derive Shared Secret S = r * K_view<br/>Compute Stealth Pubkey P_stealth"| Sender
-    Sender -->|"3. invoke: send_sol(ephemeral_pubkey_R, amount)"| StealthEscrowPDA
-    StealthEscrowPDA -.->|"CPI: Transfer Funds to Vault"| SystemProgram
-    Sender -->|"4. invoke: publish_announcement(R, P_stealth)"| AnnouncementPDA
-
-    %% Scanning Flow
-    AnnouncementPDA -.->|"WebSocket / Geyser Stream Logs"| Recipient
-    Recipient -->|"5. Scan & Compute S' = v * R<br/>Derive Matching P_stealth"| Recipient
-
-    %% Claim Flow
-    Recipient -->|"6. invoke: claim_stealth_funds(signature / claim_proof)"| SignerCheck
-    SignerCheck --> SeedDerivation
-    SeedDerivation --> ReentrancyGuard
-    ReentrancyGuard -->|"7. CPI: Disburse Funds + Close Accounts"| SystemProgram
-    SystemProgram -->|"Rent + Funds Transferred"| Recipient
+    subgraph Indexer ["Scanning & Notification Engine"]
+        SL1 --> S1["Filter View-Tag == SHA256(k_view * R)[0]"]
+        S1 -- "Mismatch (99.6%)" --> S2["Discard Announcement (O(1))"]
+        S1 -- "Match (0.4%)" --> S3["Derive Full Shared Secret & P_stealth Check"]
+        S3 --> S4["Alert Enterprise Webhook<br/>(Discord / Slack / Resend)"]
+        S4 --> S5["Compute Stealth Private Key<br/>k_stealth = k_spend + H(S) mod n"]
+        S5 --> S6["Sweep / Settle Funds into Cold Storage"]
+    end

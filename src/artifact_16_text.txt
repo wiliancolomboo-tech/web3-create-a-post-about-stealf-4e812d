@@ -1,0 +1,3 @@
+3/6 ⚡ What makes @Stealf_ revolutionary for Solana's Sealevel runtime?
+
+1-Byte View Tags. Scanning high-throughput blocks used to require heavy local computation. Stealf's 1-byte view tag filters 99.6% of non-matching transactions before computing an elliptic-curve scalar point. True sub-second mobile scanning.

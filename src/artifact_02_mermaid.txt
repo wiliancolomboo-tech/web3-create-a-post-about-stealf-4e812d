@@ -1,0 +1,40 @@
+flowchart TD
+    subgraph Setup ["1. Recipient Key Registration"]
+        Bob[Bob / Merchant] -->|Generates| Keys["Keys: Spend Key (P_spend, s_spend)<br/>View Key (P_view, s_view)"]
+        Bob -->|Publishes Meta-Address| Registry["Stealf Registry Registry / Off-chain Directory<br/>Meta-Address: (P_spend || P_view)"]
+    end
+
+    subgraph Transfer ["2. Non-Interactive Stealth Transfer"]
+        Alice[Alice / Payer] -->|Queries| Registry
+        Alice -->|Generates Ephemeral Keypair| Ephem["Ephemeral Keypair (R, r)"]
+        Alice -->|ECDH Computation| SharedSecret["Shared Secret S = r * P_view"]
+        Alice -->|Derive Stealth Pubkey| HashScalar["Scalar tweak: c = H(S)"]
+        Alice -->|Compute Stealth Address| P_stealth["P_stealth = P_spend + c * G"]
+        Alice -->|Submit Transaction| SolanaCluster["Solana Mainnet-Beta Cluster"]
+        SolanaCluster -->|Emit Event / Memo| StealfMemo["Memo/Instruction Payload:<br/>Ephemeral Pubkey R + Nonce"]
+        SolanaCluster -->|Transfer SOL/SPL| P_stealthAcc["Stealth Account (P_stealth)"]
+    end
+
+    subgraph Detection ["3. Passive Stealth Detection Daemon"]
+        Scanner["Stealf Enterprise Scanning Daemon"] -->|Polls RPC Block Logs| SolanaCluster
+        Scanner -->|Extracts Ephemeral Pubkey R| Parser["Payload Parser"]
+        Parser -->|Compute Shared Secret| ScannerECDH["S' = s_view * R"]
+        ScannerECDH -->|Derive Scalar c'| ScannerTweak["c' = H(S')"]
+        ScannerTweak -->|Compute Check Pubkey| CheckPubkey["P_check = P_spend + c' * G"]
+        CheckPubkey -->|Compare Addresses| MatchDecision{"P_check == P_stealth?"}
+        MatchDecision -- "No" --> Discard["Ignore (Not Bob's Payment)"]
+        MatchDecision -- "Yes" --> NotifyHook["Trigger Webhook / Notification Event"]
+    end
+
+    subgraph EnterpriseRelay ["4. Enterprise Integration Layer"]
+        NotifyHook --> DiscordBot["Discord / Slack Enterprise Webhook"]
+        NotifyHook --> ResendAPI["Resend Email API Settlement Receipt"]
+        NotifyHook --> InternalDB["PostgreSQL ERP Ledger"]
+    end
+
+    subgraph Sweep ["5. Spending & Liquidity Sweeping"]
+        Bob -->|Retrieves Secret Scalar c'| BobSigner["Bob Cold Signer / CLI"]
+        BobSigner -->|Computes Stealth Private Key| StealthPriv["s_stealth = s_spend + c' (mod n)"]
+        StealthPriv -->|Signs Transfer Instruction| SweepTx["Sweep Transaction to Cold / Treasury"]
+        SweepTx --> SolanaCluster
+    end

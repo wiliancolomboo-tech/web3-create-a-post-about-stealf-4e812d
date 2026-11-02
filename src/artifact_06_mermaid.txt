@@ -1,0 +1,5 @@
+flowchart LR
+    Threat1[Front-Running / Mempool Sniffing] --> Control1[Zero Knowledge of Private Scalar p_stealth]
+    Threat2[PDA Collision Attack] --> Control2[Cryptographic 256-bit Seed with Ephemeral Key]
+    Threat3[Reentrancy on Claim] --> Control3[Check-Effects-Interactions: is_claimed set to true first]
+    Threat4[Unfunded Gas Trap] --> Control4[Dual-Signer Architecture: Relayer Pays Gas]

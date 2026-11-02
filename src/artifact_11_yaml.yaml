@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  stealf-scanner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stealf_production_scanner
+    restart: always
+    environment:
+      - SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+      - STEALF_PROGRAM_ID=SteALF1111111111111111111111111111111111111
+      - TEST_VIEW_KEY=${PRIVATE_VIEW_KEY}
+      - TEST_SPEND_PUB=${SPEND_PUBLIC_KEY}
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+      - PORT=8080
+    ports:
+      - "8080:8080"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"

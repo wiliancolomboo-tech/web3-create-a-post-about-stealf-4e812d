@@ -1,0 +1,6 @@
+5/6 🚢 We built a complete, production-grade end-to-end stack:
+• Production Anchor program with atomic SOL transfers & registry PDAs
+• Sub-second scanner daemon with Discord & @resend webhooks
+• Turnkey Dockerized deployment
+
+Code is 100% open-source: github.com/sponsor/stealf-core

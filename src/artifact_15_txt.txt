@@ -1,0 +1,10 @@
++------------------------------------------------------------------------------------------------------+
+| TEST CASE IDENTIFIER                   | OBJECTIVE / SCENARIO         | EDGE CASE TESTED   | STATUS  |
++----------------------------------------+------------------------------+--------------------+---------+
+| QA-STEALF-01: DKSAP Key Derivation     | Point multiplication test    | Base generator     | PASSED  |
+| QA-STEALF-02: View-Only Discovery      | Scanner identification       | Zero spends leaked | PASSED  |
+| QA-STEALF-03: Spend Key Recovery       | Private key scalar math      | Scalar modularity  | PASSED  |
+| QA-STEALF-04: Non-Linkability Check    | Repeated payment entropy     | Nonce exhaustion   | PASSED  |
+| QA-STEALF-05: Malformed Announcement   | Ephemeral key invalid bytes  | Point rejection    | PASSED  |
+| QA-STEALF-06: Webhook / Alert Delivery | Notification retry logic     | API timeout        | PASSED  |
++------------------------------------------------------------------------------------------------------+

@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  stealf-daemon:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stealf-scanning-daemon
+    restart: unless-stopped
+    environment:
+      - SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+      - SLACK_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder
+      - RESEND_API_KEY=re_123456789abcdef
+      - RECIPIENT_EMAIL=treasury@company.xyz
+      - PORT=8080
+    volumes:
+      - ./stealf-keys.json:/etc/stealf/stealf-keys.json:ro
+    ports:
+      - "8080:8080"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"

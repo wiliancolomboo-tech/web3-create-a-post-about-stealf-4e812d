@@ -1,0 +1,25 @@
+FROM node:20-slim AS builder
+
+WORKDIR /usr/src/app
+
+COPY client/package*.json ./
+COPY client/tsconfig.json ./
+RUN npm ci
+
+COPY client/src ./src
+RUN npm run build
+
+FROM node:20-slim AS runner
+
+WORKDIR /app
+ENV NODE_ENV=production
+
+COPY client/package*.json ./
+RUN npm ci --omit=dev
+
+COPY --from=builder /usr/src/app/dist ./dist
+
+# Healthcheck telemetry port
+EXPOSE 8080
+
+CMD ["node", "dist/indexer.js"]

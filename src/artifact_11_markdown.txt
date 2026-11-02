@@ -1,0 +1,26 @@
+1/3
+🚨 Financial privacy on @Solana just leveled up.
+
+Public ledgers make institutional payroll, OTC settlements, and treasury rebalancing a surveillance target. 
+
+Enter @StealfProtocol: Non-custodial stealth addresses powered by Edwards25519 Elliptic Curve Diffie-Hellman (DKSAP) 🛡️⚡
+
+2/3
+How does Stealf work under the hood?
+🔑 Receivers publish 1 static Meta-Address (Spend + View keys)
+🎲 Senders derive a one-time destination address (PDA) on-chain
+⚡ 1-byte view tags slash recipient scan times by 99.6%
+💰 Receivers retain 100% custody & auto-sweep to cold storage
+
+Zero shared mixer pools. Zero liquidity fragmentation. Zero regulatory toxicity.
+
+3/3
+We've open-sourced the complete end-to-end Stealf stack:
+✅ Production Anchor Smart Contract
+✅ High-Speed Indexer & Automated Treasury Sweeper
+✅ Enterprise Discord/Slack Webhook Integration
+✅ Dockerized 1-click infrastructure
+
+Check out our full technical submission and code: https://github.com/stealf-protocol/stealf-core
+
+#Solana #DeFi #Privacy #Web3 #Rust

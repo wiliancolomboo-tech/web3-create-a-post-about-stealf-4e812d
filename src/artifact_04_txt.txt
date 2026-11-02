@@ -1,24 +1,28 @@
-+------------------------------------------------------------------------------------------------------+
-| Threat Vector             | Attack Path                     | Architectural Mitigation               |
-+---------------------------+---------------------------------+----------------------------------------+
-| Front-Running / MEV Hijack| Mempool searcher detects claim  | Signer constraint: `stealth_signer`    |
-|                           | TX and replaces destination     | must sign. Only holder of the private  |
-|                           | address.                        | key derived from shared secret can     |
-|                           |                                 | author valid signatures.              |
-+---------------------------+---------------------------------+----------------------------------------+
-| Double-Claim / Reentrancy | Calling `claim_stealth_sol`     | State update sets `claimed = true`    |
-|                           | repeatedly in the same slot.    | before CPI transfer; account is fully  |
-|                           |                                 | closed in the same transaction.       |
-+---------------------------+---------------------------------+----------------------------------------+
-| Vault Seed Collision      | Crafting identical pubkey seeds | PDA derivation strictly enforced:     |
-|                           | to drain neighboring escrows.   | `seeds = [b"vault", stealth_recipient]`|
-|                           |                                 | Anchor validates seeds against caller. |
-+---------------------------+---------------------------------+----------------------------------------+
-| Rent Drainage             | Leaving dust accounts on-chain  | Account lifecycle enforces complete    |
-|                           | indefinitely.                   | destruction and lamport transfer to   |
-|                           |                                 | the claimant's destination address.    |
-+---------------------------+---------------------------------+----------------------------------------+
-| Privacy Leak (Timing/IP)  | Monitoring RPC broadcast to tie | Decoupled announcement indexers. Senders|
-|                           | sender IP to recipient claim.   | and recipients can query via Geyser    |
-|                           |                                 | WebSocket through non-custodial relays.|
-+---------------------------+---------------------------------+----------------------------------------+
++-------------------------------------------------------------------------------------------+
+|                                STEALF RUNTIME TOPOLOGY                                    |
++-------------------------------------------------------------------------------------------+
+|                                                                                           |
+|    +-------------------+           +-----------------------------------------------+      |
+|    | Corporate Treasury|           |                 Solana Cluster                |      |
+|    | Sender Agent      |           |  +---------------------+  +-----------------+ |      |
+|    +---------+---------+           |  | Stealf Core Program |  | Stealth Accounts| |      |
+|              |                     |  +----------+----------+  +--------+--------+ |      |
+|              | Transmit Payment &  |             ^                      ^          |      |
+|              | Ephemeral Key       |             |                      |          |      |
+|              +---------------------+-------------+                      |          |      |
+|                                    |             |                      |          |      |
+|                                    +-------------|----------------------+          |      |
+|                                                  |                                        |
+|    +-------------------+                         | Real-time RPC Geyser /                 |
+|    | Enterprise Vault  |                         | WebSocket Event Logs                   |
+|    | Scanning Daemon   |<------------------------+                                        |
+|    +---------+---------+                                                                  |
+|              |                                                                            |
+|              +--------------------------+----------------------------+                    |
+|              | Sweep Validated Funds    | Broadcast Audit Log        | Dispatch Webhook   |
+|              v                          v                            v                    |
+|    +-------------------+      +-------------------+      +-------------------+            |
+|    | Cold Storage /    |      | Enterprise SIEM / |      | Slack / Discord / |            |
+|    | Multisig Vault    |      | Datadog Metrics   |      | PagerDuty Treasury|            |
+|    +-------------------+      +-------------------+      +-------------------+            |
++-------------------------------------------------------------------------------------------+

@@ -1,0 +1,5 @@
+SOLANA_RPC_URL=https://api.devnet.solana.com
+SOLANA_WS_URL=wss://api.devnet.solana.com
+VIEW_PRIVATE_KEY_HEX=4a5f6e8b... # 32-byte hex
+SPEND_PRIVATE_KEY_HEX=7c9d0a1e... # 32-byte hex
+SLACK_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder

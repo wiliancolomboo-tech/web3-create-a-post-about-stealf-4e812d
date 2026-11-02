@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  stealf-indexer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stealf-scanning-agent
+    restart: always
+    environment:
+      - SOLANA_RPC_URL=https://api.devnet.solana.com
+      - STEALF_PROGRAM_ID=Stea1f11111111111111111111111111111111111
+      - VIEWING_PRIVATE_KEY=${VIEWING_PRIVATE_KEY}
+      - SPENDING_PUBLIC_KEY=${SPENDING_PUBLIC_KEY}
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - ALERT_EMAIL_RECIPIENT=${ALERT_EMAIL_RECIPIENT}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"

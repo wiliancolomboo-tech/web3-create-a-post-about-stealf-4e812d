@@ -1,0 +1,7 @@
+Stealf Protocol Unit & Integration Tests
+    ✔ 1. Registers a Stealth Meta-Address successfully (412ms)
+    ✔ 2. Fails when registering with metadata exceeding 64 bytes (84ms)
+    ✔ 3. Executes complete DKSAP stealth transfer and announces on-chain (625ms)
+    ✔ 4. Fails transfer with zero SOL amount (78ms)
+
+  4 passing (1.20s)

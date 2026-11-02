@@ -1,0 +1,1 @@
+npm i @coral-xyz/anchor @solana/web3.js @solana/spl-token @noble/curves @noble/hashes chai

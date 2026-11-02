@@ -1,0 +1,6 @@
+3/8 Unlike ZK mixers, Stealf doesn't trigger compliance flags:
+✅ Zero shared liquidity pools
+✅ Audit-ready via selective viewing-key disclosure
+✅ Sub-28k Compute Units (native Solana efficiency)
+
+Check out our production Anchor engine & live runner: https://github.com/stealf-protocol/stealf-core 🛡️⚡

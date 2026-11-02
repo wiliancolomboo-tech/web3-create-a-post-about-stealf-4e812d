@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  stealf-scanner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      - SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+      - STEALF_PROGRAM_ID=Stea1f1111111111111111111111111111111111111
+      - DISCORD_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder
+      - RESEND_API_KEY=re_enterprise_key_12345
+      - ALERT_EMAIL=security-audit@enterprise.org
+    command: >
+      scanner-daemon
+      --view-privkey ${RECIPIENT_VIEW_PRIVKEY}
+      --spend-privkey ${RECIPIENT_SPEND_PRIVKEY}
+      --sweep-to ${COLD_STORAGE_PUBLIC_KEY}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"

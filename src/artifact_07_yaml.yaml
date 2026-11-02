@@ -1,0 +1,26 @@
+# File: docker-compose.yml
+version: "3.8"
+
+services:
+  stealf-scanner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+      - SOLANA_WS_URL=wss://api.mainnet-beta.solana.com
+      - PROGRAM_ID=StEALF1111111111111111111111111111111111111
+      - BOB_VIEW_PRIVATE_KEY=${BOB_VIEW_PRIVATE_KEY}
+      - BOB_SPEND_PUBLIC_KEY=${BOB_SPEND_PUBLIC_KEY}
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - RESEND_RECIPIENT_EMAIL=treasury@enterprise.com
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3

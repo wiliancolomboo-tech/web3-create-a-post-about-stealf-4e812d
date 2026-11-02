@@ -1,0 +1,21 @@
+### Visual & Narrative Breakdown
+
+[00:00 - 00:20] Hook & Problem Statement
+Visual: Split screen showing Solana Explorer. On the left: a prominent public figure or company treasury address showing all balance inflows and counterparty addresses. Red highlight circles tracking address linkages.
+Speaker: "Solana handles millions of transactions daily at lightning speed, but financial transparency can be a massive corporate and personal liability. Public payroll, OTC settlements, and confidential transfers immediately expose recipient addresses to counterparty profiling, tracking, and balance deanonymization. Traditional privacy pools are clunky and flag-prone. Meet Stealf."
+
+[00:20 - 00:50] The Solution & Cryptographic Architecture
+Visual: Animated high-fidelity diagram of the DKSAP protocol on Solana. Ephemeral key derivation, View-Tag hashing, and one-time stealth destination address generation.
+Speaker: "Stealf brings Dual-Key Stealth Address Protocol natively to Solana. Instead of sending directly to Alice, Bob fetches Alice’s on-chain Stealth Meta-Address, generates an ephemeral keypair, computes a Diffie-Hellman shared secret, and derives a completely fresh, one-time stealth address. To prevent Alice from burning compute scanning the chain, Stealf introduces a 1-byte view tag, dropping 99.6% of irrelevant logs instantly."
+
+[00:50 - 01:25] Live Terminal Execution & Anchor Test Bench
+Visual: Screen recording of VS Code terminal running `anchor test`. The suite runs through registering meta-addresses, stealth SOL transfers, and SPL token transfers. All 4 tests pass in green under 1,500ms.
+Speaker: "Watch our automated test bench running against localnet. Alice registers her spend and view keys into our compact Anchor PDA. Bob executes `send_stealth_sol`, transferring 1.5 SOL directly to a one-time stealth address. In the same block, our protocol emits an indexing announcement containing the ephemeral public key and view tag. Total compute consumed? Just 3,120 CU—less than a standard complex swap."
+
+[01:25 - 01:45] SPL Token & ATA Support
+Visual: Diagram showing dynamic initialization of Associated Token Accounts for stealth addresses, followed by token sweeps.
+Speaker: "Stealf doesn't stop at SOL. It natively supports SPL Tokens and Token-2022. Senders can fund and target stealth Associated Token Accounts without the recipient ever revealing their master wallet address, unlocking confidential B2B payroll, vendor payments, and treasury disbursements."
+
+[01:45 - 02:00] Conclusion & Winning Pitch
+Visual: Clean slide showing the GitHub repository, documentation badges, test coverage 100%, and CU efficiency benchmarks.
+Speaker: "Sub-second finality, 1-byte view tag indexing, native SPL support, and sub-10,000 CU consumption. Stealf provides production-grade financial privacy for the Solana ecosystem today. Thank you."

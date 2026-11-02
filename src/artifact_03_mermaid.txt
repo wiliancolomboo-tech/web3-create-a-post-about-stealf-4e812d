@@ -1,0 +1,41 @@
+flowchart TD
+    subgraph RecipientSetup["1. Recipient Identity Setup"]
+        R_Keys["Generate Dual Keys:<br/>Spend Keypair (s_spend, P_spend)<br/>Scan Keypair (s_scan, P_scan)"]
+        R_Meta["Publish Stealf Meta-Address:<br/>stealf:P_spend:P_scan"]
+        R_Keys --> R_Meta
+    end
+
+    subgraph SenderExecution["2. Sender Dispatch Loop"]
+        S_Input["Sender obtains recipient Meta-Address"]
+        S_Eph["Generate Ephemeral Keypair (r, R = r * G)"]
+        S_ECDH["Compute Shared Secret:<br/>S = r * P_scan"]
+        S_Stealth["Derive Stealth Pubkey:<br/>P_st = P_spend + H(S)*G"]
+        S_Tx["Construct Solana Tx:<br/>1. System Transfer SOL/SPL to P_st<br/>2. Emit Stealf Program 'Announce' with R & Hint"]
+        S_Input --> S_Eph --> S_ECDH --> S_Stealth --> S_Tx
+    end
+
+    subgraph SolanaL1["3. Solana Blockchain Runtime"]
+        Anchor_Prog["Stealf Anchor Program Registry"]
+        Vault_PDA["Ephemeral Stealth Account (P_st)"]
+        Event_Log["Announcement Event Log:<br/>{ ephemeral_pubkey: R, view_tag: H(S)[0], metadata }"]
+        S_Tx -->|"Deposit Funds"| Vault_PDA
+        S_Tx -->|"Invoke Emit Instruction"| Anchor_Prog
+        Anchor_Prog --> Event_Log
+    end
+
+    subgraph RecipientScan["4. Off-Chain Scanner Daemon"]
+        D_Listen["RPC WebSocket / Geyser Plugin listens to Announcements"]
+        D_Check{"Fast View Tag Match?<br/>view_tag == H(s_scan * R)[0]"}
+        D_Derive["Derive Full Shared Secret S' = s_scan * R<br/>Verify P_st' == P_spend + H(S')*G"]
+        D_Notify["Enterprise Webhook:<br/>Discord / Slack / Resend Email Alert"]
+        D_Sweep["Sign & Execute Sweep Tx:<br/>s_st = s_spend + H(S') mod q<br/>Transfer P_st -> Clean Cold Wallet"]
+
+        Event_Log --> D_Listen
+        D_Listen --> D_Check
+        D_Check -- No --> D_Skip["Discard Event (Zero State Cost)"]
+        D_Check -- Yes --> D_Derive
+        D_Derive --> D_Notify
+        D_Derive --> D_Sweep
+    end
+
+    R_Meta -.-> S_Input

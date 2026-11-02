@@ -1,0 +1,6 @@
+SOLANA_RPC_URL=https://api.devnet.solana.com
+SPENDING_PRIVATE_KEY=[12,45,67,...]
+VIEWING_PRIVATE_KEY=[99,88,77,...]
+TREASURY_VAULT_PUBKEY=EnterColdMultisigPubkeyHere
+RESEND_API_KEY=re_123456789
+DISCORD_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder

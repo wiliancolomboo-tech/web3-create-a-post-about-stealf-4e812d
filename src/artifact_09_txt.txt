@@ -1,0 +1,11 @@
++-----------------------------------------------------------------------------------------+
+|                               TURNKEY RUNBOOK: STEALF DAEMON                            |
++-------------------+---------------------------------------------------------------------+
+| Lifecycle Phase   | Command / Procedure                                                 |
++-------------------+---------------------------------------------------------------------+
+| 1. Build Engine   | anchor build --verifiable                                           |
+| 2. Deploy Program | anchor deploy --provider.cluster devnet                             |
+| 3. Seed Accounts  | yarn stealf-cli generate-keys                                        |
+| 4. Launch Daemon  | docker compose up -d --build                                        |
+| 5. Telemetry QA   | curl -f http://localhost:8080/healthz                              |
++-------------------+---------------------------------------------------------------------+

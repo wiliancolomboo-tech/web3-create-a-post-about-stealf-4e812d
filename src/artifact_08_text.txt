@@ -1,0 +1,28 @@
+1/6 🚨 Privacy on @Solana just took a massive leap forward.
+
+Introducing Stealf: The Enterprise Non-Interactive Stealth Address Protocol built natively for high-velocity SVM transactions.
+
+Unlinkable payments. 1-byte view-tag scanning. Zero balance leaks. 🧵👇
+
+2/6 🔍 The Problem:
+Every Solana transaction leaves an immutable trail. Payroll, vendor payouts, and treasury management expose enterprise balances to front-running and surveillance bots.
+
+Public ledgers shouldn't mean public financial secrets.
+
+3/6 ⚡ How Stealf Solves It:
+Using Dual-Key Stealth Addresses (DKSAP) optimized on Curve25519 & Ed25519:
+• Senders derive one-time stealth public keys
+• 1-byte view-tags allow 10,000+ tx/sec off-chain scanning
+• Only recipient view keys identify funds.
+
+4/6 🏢 Built for Enterprise:
+✅ Sub-millisecond scanning overhead
+✅ Zero-knowledge relayer support for gasless forwarding
+✅ Turnkey webhook & ERP integrations (Discord/Slack/Resend)
+✅ Full Anchor SVM contract + TypeScript SDK
+
+5/6 📦 100% open-source, tested, and turnkey-ready for deployment on Devnet & Mainnet.
+
+Check out the full architecture and run the daemon locally in 1 click with Docker. 🛠️
+
+6/6 Read the full deep dive, inspect the code, and join the confidential settlement revolution with @Stealf on Solana! 🚀⚡

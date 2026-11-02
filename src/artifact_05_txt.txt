@@ -1,0 +1,10 @@
+Threat Model Matrix
+  ┌─────────────────────────────────┬──────────────────────────────────┐
+  │ Vulnerability Vector            │ Mitigation Architecture          │
+  ├─────────────────────────────────┼──────────────────────────────────┤
+  │ 1. PDA Replay / Collision       │ Seeds bound to ephemeral_pubkey  │
+  │ 2. Front-Running Claims         │ Strict Signer Check on Vault     │
+  │ 3. Rent Sybil Attacks           │ Recipient Pays Closure / Claim   │
+  │ 4. Off-Curve Key Derivations    │ Non-Zero Curve Assertions        │
+  │ 5. View-Tag False Positives     │ Full DH Check on Client Match    │
+  └─────────────────────────────────┴──────────────────────────────────┘

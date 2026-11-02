@@ -1,0 +1,8 @@
+{
+  "status": "HEALTHY",
+  "service": "stealf-sentinel",
+  "network": "devnet",
+  "blockHeight": 268491823,
+  "lastScannedSlot": 268491820,
+  "uptimeSeconds": 86400
+}

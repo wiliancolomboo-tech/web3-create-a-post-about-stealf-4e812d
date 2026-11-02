@@ -1,0 +1,24 @@
+{
+  "name": "@stealf/sdk",
+  "version": "1.0.0",
+  "description": "Production SDK and Scanner Agent for Stealf on Solana",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "scan": "ts-node src/cli.ts scan",
+    "send": "ts-node src/cli.ts send"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.30.1",
+    "@noble/curves": "^1.4.0",
+    "@noble/hashes": "^1.4.0",
+    "@solana/web3.js": "^1.95.3",
+    "axios": "^1.7.2",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.2"
+  }
+}

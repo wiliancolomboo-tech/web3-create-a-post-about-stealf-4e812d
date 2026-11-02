@@ -1,0 +1,8 @@
+No off-chain negotiation. No centralized pools. No regulatory risk. 
+
+Stealf gives Solana users complete financial sovereignty with sub-second finality.
+
+Read our full technical architecture, grab the SDK, and start building:
+👉 github.com/stealf-solana/stealf-protocol
+
+#Solana #DeFi #Privacy #Web3Security

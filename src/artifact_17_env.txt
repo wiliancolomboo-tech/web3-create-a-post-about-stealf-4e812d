@@ -1,0 +1,5 @@
+SOLANA_RPC_URL="https://api.devnet.solana.com"
+STEALF_PROGRAM_ID="Stea1f1111111111111111111111111111111111111"
+DISCORD_WEBHOOK_URL="https://api.example.com/webhooks/alerts/placeholder"
+RESEND_API_KEY="re_123456789abcdef"
+NOTIFICATION_EMAIL="treasury@enterprise.com"

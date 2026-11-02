@@ -1,0 +1,10 @@
++---------------------------------------------+------------------------------------+-----------+
+| Test Case                                   | Description                        | Expected  |
++---------------------------------------------+------------------------------------+-----------+
+| TC-01: Keypair & Encoding                   | Verify 64-byte meta-address codecs | PASS      |
+| TC-02: Non-Interactive DKSAP Derivation     | Sender + Receiver ECDH consistency | PASS      |
+| TC-03: View-Tag Filter Efficiency           | 1-byte view tag matches secret     | PASS      |
+| TC-04: False Positive Resistance            | Random keys rejected by filter     | PASS      |
+| TC-05: Spending Key Authority               | Derived p can sign on Solana       | PASS      |
+| TC-06: End-to-End Devnet Settlement         | Sol transfer & sweep verification  | PASS      |
++---------------------------------------------+------------------------------------+-----------+

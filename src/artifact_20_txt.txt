@@ -1,0 +1,24 @@
+Sender                                                  Recipient
+  (Knows K_spend, K_view)                                   (Knows s, v)
+            │                                                    │
+ 1. Generate Ephemeral Keypair                                   │
+    r ∈_R Z_q, R = r * G                                         │
+            │                                                    │
+ 2. Compute Shared Secret                                        │
+    S = r * K_view                                               │
+    h = SHA-256(S)                                               │
+            │                                                    │
+ 3. Compute Derived Stealth Pubkey                               │
+    P = K_spend + h * G                                          │
+            │                                                    │
+ 4. Dispatch Transfer to P                                       │
+    + Emit Announcement: [R, ViewTag]                            │
+            ├───────────────────────────────────────────────────>│
+            │                                          5. Scan Transaction Log
+            │                                             Compute S' = v * R
+            │                                             h' = SHA-256(S')
+            │                                             Verify ViewTag
+            │                                                    │
+            │                                          6. Derive Spending Key
+            │                                             p = s + h' (mod q)
+            │                                             p * G == P

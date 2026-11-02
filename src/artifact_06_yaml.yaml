@@ -1,0 +1,23 @@
+# File: /docker-compose.yml
+version: "3.8"
+
+services:
+  stealf-scanner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - RPC_ENDPOINT=https://api.mainnet-beta.solana.com
+      - PROGRAM_ID=Stea1fX4QJjN472mY8LdF5yJjKqPqM5UuNqPjW2x111
+      - VIEWING_PRIVATE_KEY=${VIEWING_PRIVATE_KEY}
+      - SPENDING_PUBLIC_KEY=${SPENDING_PUBLIC_KEY}
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+      - PORT=8080
+    ports:
+      - "8080:8080"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"

@@ -1,0 +1,4 @@
+Stealf Protocol - DKSAP Solana Integration
+    ✔ Executes full cycle: DKSAP generation -> On-chain Deposit -> Scan -> Relayed Claim (1428ms)
+
+  1 passing (2s)

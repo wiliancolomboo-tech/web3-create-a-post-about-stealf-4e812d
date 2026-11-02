@@ -1,0 +1,10 @@
+stealf-protocol/
+├── Anchor.toml
+├── Cargo.toml
+├── programs/
+│   └── stealf/
+│       ├── Cargo.toml
+│       └── src/
+│           └── lib.rs
+└── tests/
+    └── stealf.ts

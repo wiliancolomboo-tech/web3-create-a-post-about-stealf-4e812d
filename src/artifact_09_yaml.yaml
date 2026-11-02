@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  stealf-scanner:
+    build: .
+    restart: always
+    environment:
+      - SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+      - SOLANA_WS_URL=wss://api.mainnet-beta.solana.com
+      - PROGRAM_ID=Stea1f1111111111111111111111111111111111111
+      - VIEW_PRIVATE_KEY_HEX=${VIEW_PRIVATE_KEY_HEX}
+      - SPEND_PUBLIC_KEY_HEX=${SPEND_PUBLIC_KEY_HEX}
+      - ENTERPRISE_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder
+      - METRICS_PORT=9090
+    ports:
+      - "9090:9090"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
