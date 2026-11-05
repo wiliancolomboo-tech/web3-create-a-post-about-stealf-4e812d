@@ -5,6 +5,6 @@ VIEWING_PRIVATE_KEY_HEX=4ccd089b28ff96da9db6c346ec114e0f5b8a319f35aba624da8cf6ed
 SPENDING_PUBLIC_KEY_HEX=3b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da29
 SLACK_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder
 DISCORD_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder
-RESEND_API_KEY=re_live_enterpriseKey123
+RESEND_API_KEY="mock_development_token_00000000000000"
 ALERT_EMAIL=cfo-audit@enterprise.org
 PORT=8080

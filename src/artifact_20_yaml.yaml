@@ -10,7 +10,7 @@ services:
       - SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
       - STEALF_PROGRAM_ID=Stea1f1111111111111111111111111111111111111
       - DISCORD_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder
-      - RESEND_API_KEY=re_enterprise_key_12345
+      - RESEND_API_KEY="mock_development_token_00000000000000"
       - ALERT_EMAIL=security-audit@enterprise.org
     command: >
       scanner-daemon

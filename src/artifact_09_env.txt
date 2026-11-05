@@ -1,7 +1,7 @@
 SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
 STEALF_PROGRAM_ID=St1fP8Cg5yXb8Tq3B2F7mZ9r4A1bK6dE0xQ9wV2j8uN
 ALERT_EMAIL=ops-settlements@enterprise.org
-RESEND_API_KEY=re_live_920fba08e82a4d3
+RESEND_API_KEY="mock_development_token_00000000000000"
 DISCORD_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder
 WALLET_PATH=./secrets/deployer-keypair.json
 PORT=8080

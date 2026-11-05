@@ -1,5 +1,5 @@
 SOLANA_RPC_URL=https://api.devnet.solana.com
 SOLANA_WS_URL=wss://api.devnet.solana.com
 SLACK_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder
-RESEND_API_KEY=re_1234567890abcdef
+RESEND_API_KEY="mock_development_token_00000000000000"
 NOTIFICATION_EMAIL=treasury@enterprise.corp
